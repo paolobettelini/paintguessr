@@ -9,6 +9,7 @@ atlassian-ide-plugin.xml
 ### vscode ###
 .vscode/
 .settings/
+.project
 
 ### Linux ###
 *~
