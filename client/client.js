@@ -21,5 +21,5 @@ function create() {
 }
 
 function join(token) {
-	server.send("join " + token);
+	server.send("join " + token + " username");
 }

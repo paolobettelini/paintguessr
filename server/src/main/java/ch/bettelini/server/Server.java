@@ -47,7 +47,7 @@ public class Server extends WebSocketServer {
 		switch (args[0]) {
 			case "create":
 				Game room = new Game();
-				room.addPlayer(client);
+				room.addPlayer(client, args[1]);
 				
 				String token = generateToken();
 				games.put(token, room);
@@ -58,7 +58,7 @@ public class Server extends WebSocketServer {
 			case "join":
 				for (String tok : games.keySet()) {
 					if (tok.equals(args[1])) {
-						games.get(tok).addPlayer(client);
+						games.get(tok).addPlayer(client, args[2]);
 						break;
 					}
 				}
