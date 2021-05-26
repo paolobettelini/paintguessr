@@ -5,6 +5,7 @@ server.onopen = function(e) {
 };
 
 server.onmessage = function(e) {
+	console.log(e);
 	document.body.innerHTML += "<p>" + e.data + "</p>";
 };
 
@@ -17,7 +18,7 @@ server.onerror = function(e) {
 };
 
 function create() {
-	server.send("create");
+	server.send("create Paolo");
 }
 
 function join(token) {

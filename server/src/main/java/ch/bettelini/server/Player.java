@@ -1,5 +1,7 @@
 package ch.bettelini.server;
 
+import org.java_websocket.WebSocket;
+
 public class Player {
 
 	private String username;

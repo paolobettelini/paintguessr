@@ -1,10 +1,11 @@
 package ch.bettelini.server;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.java_websocket.WebSocket;
 
-public class Game implements Runnable {
+public class Game {
 
 	/* COMMANDS */
 
@@ -23,7 +24,11 @@ public class Game implements Runnable {
 	  * 1  -> Join this game <token> <username>
 	  * 
 	  * 16 -> My guess is <word>
+	  *
+	  * <command> <gameCode> <authToken>
 	  */
+
+	private Player drawing;
 
 	private HashMap<WebSocket, Player> players;
 
@@ -31,12 +36,16 @@ public class Game implements Runnable {
 		players = new HashMap<>();
 	}
 
-	public void run() {
-
+	protected void addPlayer(WebSocket socket, String username) {
+		players.put(socket, new Player(username));
 	}
 
-	protected void addPlayer(WebSocket client, String username) {
-		players.put(client, new Player(username));
+	protected boolean contains(WebSocket socket) {
+		return players.containsKey(socket);
+	}
+
+	protected void removePlayer(WebSocket socket) {
+		players.remove(socket);
 	}
 
 }
