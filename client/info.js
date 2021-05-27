@@ -1,4 +1,4 @@
-var username = "ciao";
+var username = "";
 
 function setUsername(v) {
     username = v;

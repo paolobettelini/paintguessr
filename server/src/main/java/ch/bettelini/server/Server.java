@@ -4,14 +4,17 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import ch.bettelini.server.game.Game;
+
 import java.util.HashMap;
+import java.util.Map;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 public class Server extends WebSocketServer {
 
-	private HashMap<String, Game> games;
+	private Map<String, Game> games;
 
 	public static void main(String[] args) {
 		new Server(new InetSocketAddress("127.0.0.1", 3333)).start();
@@ -43,9 +46,11 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onMessage(WebSocket client, String message) {
-		System.out.println("-------------");
-		System.out.println("hash: " + client.hashCode());
-
+		client.send(new byte[]{2});
+		
+		int a = 0;
+		if (a == 0) {return;}
+		
 		String[] args = message.split(" ");
 
 		switch (args[0]) {// AAAAAAAAAAA
@@ -60,7 +65,7 @@ public class Server extends WebSocketServer {
 			case "join":
 				for (String tok : games.keySet()) {
 					if (tok.equals(args[1])) {
-						games.get(tok).addPlayer(client, args[2]);
+						//games.get(tok).addPlayer(client, args[2]);
 						break;
 					}
 				}
@@ -73,7 +78,9 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onMessage(WebSocket client, ByteBuffer message) {
-	
+		byte[] data = message.array();
+		System.out.println(data[0]); // Sempre 0
+		client.send(message);
 	}
 
 	@Override

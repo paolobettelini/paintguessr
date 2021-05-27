@@ -1,6 +1,4 @@
-package ch.bettelini.server;
-
-import org.java_websocket.WebSocket;
+package ch.bettelini.server.game;
 
 public class Player {
 
