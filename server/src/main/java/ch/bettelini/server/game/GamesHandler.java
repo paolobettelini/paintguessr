@@ -1,44 +1,102 @@
 package ch.bettelini.server.game;
 
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.java_websocket.WebSocket;
+
 public class GamesHandler {
 
-    static {
-        
-    }
+	private static Map<String, Game> games;
 
-    	/* COMMANDS */
+	static {
+		games = new HashMap<>();
+	}
 
-        // code -> the room code
-        // auth -> the token authentication
-	/*
+	public static void processRequest(WebSocket socket, ByteBuffer buff) {
+		if (buff.capacity() == 0) {
+			return;
+		}
+		
+		byte[] data = buff.slice(1, buff.capacity() - 1).array();
 
-        Server -> Client
+		switch (buff.get() & 0xFF) {
+			case Game.JOIN_GAME:
 
-        00 | take code      | <code>
-        10 | join error     | <reason>
-        11 | create error   | <reason>
-	 */
+				break;
+			case Game.CREATE_GAME:
+				// Read packet data
+				boolean open = data[0] != 0;
+				int maxPlayers = data[1] & 0xFF;
+				int rounds = data[2] & 0xFF;
+				int roundDuration = data[3] & 0xFF;
+				StringBuilder builder = new StringBuilder();
+				for (int i = 4; i < data.length; i++) {
+					builder.append((char) data[i]);
+				}
+				String username = builder.toString();
 
-	 /*
-        Client -> Server
-	  
-        00 | create | <username> <max_users> <public>
-        01 | join   | <code> <username>
-        02 | start  | <code>
+				// Check values
 
-        Eventi start drawing | end drawing
-	  */
+				// Generate token
+				String token = generateToken(5);
+				
+				// Send token to client
+				socket.send(createPacket((byte) Game.TOKEN_SERVED, token.getBytes()));
+				
+				// Create new game
+				Game game = new Game(open, maxPlayers, rounds, roundDuration);
+				game.addPlayer(socket, username.toString());
+				games.put(token, game);
+				break;
+			case Game.START_GAME:
 
-      // Point on canvas:
-      // v = {uint8, uint8}
-      // point = width / v
-      /*
-        Come rappresentare un punto sul canvas in un array di byte
-        Un punto sul canvas (x, y) viene definito con  4 uint8
-        I primi 2 byte rappresentano la coordinata X, mentre gli altri 2 la coordinata Y
-        Una posizione X o Y viene rappresentata con 2 byte.
-        la posizione del pxel è data dalla lettura di quest'ultimi in BigEndian (b0 | b1 << 8)  / 65535 * width
-        e rispettivamente (b0 | b1 << 8)  / 65535 * height
-      */
+				break;
+			case Game.DRAW_BUFFER:
+			case Game.END_DRAWING:
+
+				break;
+			default:
+				break;
+		}
+	}
+
+	private static byte[] createPacket(byte cmd, byte[] data) {
+		byte[] packet = new byte[data.length + 1];
+
+		packet[0] = cmd;
+
+		for (int i = 1; i <= data.length; i++) {
+			packet[i] = data[i];
+		}
+
+		return packet;
+	}
+
+	private static Game getGame(WebSocket socket) {
+		for (Game game : games.values()) {
+			if (game.contains(socket)) {
+				return game;
+			}
+		}
+
+		return null;
+	}
+
+	private static String generateToken(int length) {
+		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		StringBuilder result;
+		
+		do {
+			result = new StringBuilder();
+
+			for (int i = 0; i < length; i++) {
+				result.append(characters.charAt((int) (Math.random() * characters.length())));
+			}
+		} while (games.containsKey(result.toString()));
+
+		return result.toString();
+	}
 
 }
