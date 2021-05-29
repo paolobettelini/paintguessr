@@ -1,8 +1,9 @@
 const TOKEN_SERVED	= 0;	// token
 const JOIN_GAME		= 1;	// token, username
 const CREATE_GAME	= 2;	// public, rounds, duration, max_players, username
-const START_GAME	= 3;	// -
-const PLAYER_JOIN	= 4;	// -
+const JOIN_RND		= 3		// username
+const START_GAME	= 4;	// -
+const PLAYER_JOIN	= 5;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const END_DRAWING	= 21;	// -
@@ -37,6 +38,8 @@ server.onmessage = function(e) {
 			name += String.fromCharCode(data[i + 1]);
 		}
 		console.log("player: " + name);
+	} else if (cmd == DRAW_BUFFER) {
+		drawLineBuf(data.slice(1, data.length));
 	}
 };
 
@@ -66,6 +69,16 @@ function joinGame(token) {
 	}
 	for (var i = 0; i < username.length; i++) {
 		view[i + 6] = username.charCodeAt(i);
+	}
+	sendToServer(packet);
+}
+
+function joinRandom() {
+	var packet = new ArrayBuffer(1 + username.length);
+	var view = new Uint8Array(packet);
+	view[0] = JOIN_RND;
+	for (var i = 0; i < username.length; i++) {
+		view[i + 1] = username.charCodeAt(i);
 	}
 	sendToServer(packet);
 }

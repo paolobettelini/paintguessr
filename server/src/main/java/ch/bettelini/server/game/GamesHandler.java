@@ -34,7 +34,7 @@ public class GamesHandler {
 			Game game = games.get(token);
 
 			String username = new String(data, TOKEN_SIZE + 1, data.length - TOKEN_SIZE - 1);
-
+			socket.send(createPacket((byte) Game.TOKEN_SERVED, token.getBytes()));
 			game.addPlayer(socket, username);
 			System.out.println("Added player to game");
 		} else if (cmd == Game.CREATE_GAME) {
@@ -57,6 +57,19 @@ public class GamesHandler {
 			Game game = new Game(open, maxPlayers, rounds, roundDuration);
 			game.addPlayer(socket, username.toString());
 			games.put(token, game);
+		} else if (cmd == Game.JOIN_RND) {
+			for (String token : games.keySet()) {
+				Game game = games.get(token);
+
+				if (game.isPublic() && !game.isFull()) {
+					String username = new String(data, 1, data.length - 1);
+					game.addPlayer(socket, username);
+					socket.send(createPacket((byte) Game.TOKEN_SERVED, token.getBytes()));
+					return;
+				}
+			}
+
+			socket.send(createPacket((byte) Game.JOIN_ERROR, "No games available".getBytes()));
 		} else if (cmd == Game.START_GAME) {
 			Game game = getGame(socket);
 
@@ -64,7 +77,11 @@ public class GamesHandler {
 
 			}
 		} else if (cmd == Game.DRAW_BUFFER || cmd == Game.END_DRAWING) {
+			Game game = getGame(socket);
 
+			if (game != null) {
+				game.broadcast(data);
+			}
 		}
 	}
 

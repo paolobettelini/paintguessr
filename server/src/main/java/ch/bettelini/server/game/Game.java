@@ -10,8 +10,9 @@ public class Game {
 	public static final int TOKEN_SERVED	= 0;	// token
 	public static final int JOIN_GAME		= 1;	// token, username
 	public static final int CREATE_GAME		= 2;	// public, max_players, rounds, round_duration, username
-	public static final int START_GAME		= 3;	// -
-	public static final int PLAYER_JOIN		= 4;	// -
+	public static final int JOIN_RND		= 3;	// username
+	public static final int START_GAME		= 4;	// -
+	public static final int PLAYER_JOIN		= 5;	// -
 
 	public static final int DRAW_BUFFER		= 20;	// point...
 	public static final int END_DRAWING		= 21;	// -
@@ -67,6 +68,14 @@ public class Game {
 		players.remove(socket);
 	}
 
+	public boolean isPublic() {
+		return open;
+	}
+
+	public boolean isFull() {
+		return players.size() == maxPlayers;
+	}
+	
 	public void broadcast(byte[] data) {
 		for (WebSocket socket : players.keySet()) {
 			socket.send(data);

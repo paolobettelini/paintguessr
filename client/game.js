@@ -10,22 +10,24 @@ ctx.strokeStyle = 'black';
 
 let counter = 0;
 const BLOCK_SIZE = 7;
-var buffer = new ArrayBuffer(BLOCK_SIZE * 4);
+
+var buffer = new ArrayBuffer(1 + BLOCK_SIZE * 4);
 var byteBuffer = new Uint8Array(buffer);
+byteBuffer[0] = DRAW_BUFFER;
 
 canvas.onmousemove = e => {
 	if (drawing) {
 		if (counter++ % BLOCK_SIZE == 0 && counter != 0) {
-			//sendToServer(byteBuffer);
-			drawLineBuf(byteBuffer)
+			sendToServer(byteBuffer);
+			//drawLineBuf(byteBuffer)
 		}
 		
 		var w = 65535 * (e.offsetX / width) | 0;
 		var h = 65535 * (e.offsetY / height) | 0;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 0] = w >> 8;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w & 0xFF;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 2] = h >> 8;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 3] = h & 0xFF;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w >> 8;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 2] = w & 0xFF;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 3] = h >> 8;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 4] = h & 0xFF;
 	}
 }
 canvas.onmousedown = e => {
