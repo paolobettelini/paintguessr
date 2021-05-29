@@ -12,11 +12,11 @@
 		}
 
 		#home {
-			display: none;
+			display: block;
 		}
 
 		#game {
-			display: block;
+			display: none;
 		}
 	</style>
 </head>
@@ -25,22 +25,30 @@
 	
 	<div id="create">
 		<h1>Create Game</h1>
-		<span id="maxUsersDisplay">Max Users (5)</span>
+		<span id="maxPlayersDisplay">Max Players (5)</span>
 		<br>
-		<input type="range" value="5" min="2" max="15" step="1" oninput="document.getElementById('maxUsersDisplay').innerHTML = 'Max Users: (' + this.value + ')'">
+		<input type="range" value="5" min="2" max="15" step="1" oninput="setMaxPlayers(this.value)">
+		<br>
+		<span id="roundsDisplay">Rounds (3)</span>
+		<br>
+		<input type="range" value="3" min="1" max="15" step="1" oninput="setRounds(this.value)">
+		<br>
+		<span id="roundDurationDisplay">Round Duration (30s)</span>
+		<br>
+		<input type="range" value="30" min="15" max="180" step="1" oninput="setRoundDuration(this.value)">
 		<br>
 		<br>
-		<input type="radio" id="public" name="visibility" value="public" checked>
+		<input type="radio" id="public" name="visibility" value="public" onchange="updateVisibility()" checked>
 		<label for="public">Public</label>
 		<br>
-		<input type="radio" id="private" name="visibility" value="private">
+		<input type="radio" id="private" name="visibility" value="private" onchange="updateVisibility()">
 		<label for="private">Private</label>
 		<br>
 		<br>
 		<span>Username</span>
 		<input id="createSectionUsername" type="text" oninput="setUsername(this.value)">
 		<br>
-		<button>Create</button>
+		<button onclick="createGame()">Create</button>
 	</div>
 	
 	<div id="home">
@@ -49,7 +57,7 @@
 		<button>Join Random</button>
 		<br><br>
 		<input id="token" type="text">
-		<button onclick="join(document.getElementById('token').value)">Join Game</button>
+		<button onclick="joinGame(document.getElementById('token').value)">Join Game</button>
 		<br>
 		<br>
 		<span>Username</span>

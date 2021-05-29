@@ -22,7 +22,7 @@ canvas.onmousemove = e => {
 		
 		var w = 65535 * (e.offsetX / width) | 0;
 		var h = 65535 * (e.offsetY / height) | 0;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 0] = w >>8;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 0] = w >> 8;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w & 0xFF;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 2] = h >> 8;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 3] = h & 0xFF;

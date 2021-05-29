@@ -2,6 +2,7 @@ const TOKEN_SERVED	= 0;	// token
 const JOIN_GAME		= 1;	// token, username
 const CREATE_GAME	= 2;	// public, rounds, duration, max_players, username
 const START_GAME	= 3;	// -
+const PLAYER_JOIN	= 4;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const END_DRAWING	= 21;	// -
@@ -19,8 +20,24 @@ server.onopen = function(e) {
 
 server.onmessage = function(e) {
 	var data = new Uint8Array(e.data);
-	console.log(data[0])
-	drawLineBuf(data)
+	var cmd = data[0];
+
+	if (cmd == TOKEN_SERVED) {
+		var token = "";
+		for (var i = 0; i < 5; i++) {
+			token += String.fromCharCode(data[i + 1]);
+		}
+		console.log("token served: " + token);
+
+		// Toggle to game view
+		showGameSection();
+	} else if (cmd == PLAYER_JOIN) {
+		var name = "";
+		for (var i = 0; i < data.length - 1; i++) {
+			name += String.fromCharCode(data[i + 1]);
+		}
+		console.log("player: " + name);
+	}
 };
 
 server.onclose = function(e) {
@@ -35,19 +52,34 @@ function sendToServer(data) {
 	server.send(data);
 }
 
-function create() {
-	server.send("create Paolo");
+function joinGame(token) {
+	if (username.length == 0) {
+		console.log("invalid username");
+		return;
+	}
+
+	var packet = new ArrayBuffer(1 + 5 + username.length);
+	var view = new Uint8Array(packet);
+	view[0] = JOIN_GAME;
+	for (var i = 0; i < 5; i++) {
+		view[i + 1] = token.charCodeAt(i);
+	}
+	for (var i = 0; i < username.length; i++) {
+		view[i + 6] = username.charCodeAt(i);
+	}
+	sendToServer(packet);
 }
 
-function join(token) {
-	server.send("join " + token + " username");
+function createGame() {
+	var packet = new ArrayBuffer(5 + username.length);
+	var view = new Uint8Array(packet);
+	view[0] = CREATE_GAME;
+	view[1] = public ? ~0 : 0;
+	view[2] = maxPlayers;
+	view[3] = rounds;
+	view[4] = roundDuration;
+	for (var i = 0; i < username.length; i++) {
+		view[i + 5] = username.charCodeAt(i);
+	}
+	sendToServer(packet);
 }
-
-/*
-var buffer = new ArrayBuffer(10);
-var bytes = new Uint8Array(buffer);
-for (var i=0; i<bytes.length; i++) {
- bytes[i] = i;
-}
-server.send(buffer);
-*/

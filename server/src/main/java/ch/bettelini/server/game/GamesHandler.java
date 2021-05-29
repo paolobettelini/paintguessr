@@ -8,6 +8,7 @@ import org.java_websocket.WebSocket;
 
 public class GamesHandler {
 
+	private final static int TOKEN_SIZE = 5;
 	private static Map<String, Game> games;
 
 	static {
@@ -19,56 +20,61 @@ public class GamesHandler {
 			return;
 		}
 		
-		byte[] data = buff.slice(1, buff.capacity() - 1).array();
+		byte[] data = buff.array();
+		int cmd = data[0] & 0xFF;
 
-		switch (buff.get() & 0xFF) {
-			case Game.JOIN_GAME:
+		if (cmd == Game.JOIN_GAME) {
+			String token = new String(data, 1, TOKEN_SIZE);
 
-				break;
-			case Game.CREATE_GAME:
-				// Read packet data
-				boolean open = data[0] != 0;
-				int maxPlayers = data[1] & 0xFF;
-				int rounds = data[2] & 0xFF;
-				int roundDuration = data[3] & 0xFF;
-				StringBuilder builder = new StringBuilder();
-				for (int i = 4; i < data.length; i++) {
-					builder.append((char) data[i]);
-				}
-				String username = builder.toString();
+			if (!games.containsKey(token)) {
+				socket.send(createPacket((byte) Game.JOIN_ERROR, "Invalid token".getBytes()));
+				return;
+			}
 
-				// Check values
+			Game game = games.get(token);
 
-				// Generate token
-				String token = generateToken(5);
-				
-				// Send token to client
-				socket.send(createPacket((byte) Game.TOKEN_SERVED, token.getBytes()));
-				
-				// Create new game
-				Game game = new Game(open, maxPlayers, rounds, roundDuration);
-				game.addPlayer(socket, username.toString());
-				games.put(token, game);
-				break;
-			case Game.START_GAME:
+			String username = new String(data, TOKEN_SIZE + 1, data.length - TOKEN_SIZE - 1);
 
-				break;
-			case Game.DRAW_BUFFER:
-			case Game.END_DRAWING:
+			game.addPlayer(socket, username);
+			System.out.println("Added player to game");
+		} else if (cmd == Game.CREATE_GAME) {
+			// Read packet data
+			boolean open = data[1] != 0;
+			int maxPlayers = data[2] & 0xFF;
+			int rounds = data[3] & 0xFF;
+			int roundDuration = data[4] & 0xFF;
+			String username = new String(data, 5, data.length - 5);
 
-				break;
-			default:
-				break;
+			// Check values
+
+			// Generate token
+			String token = generateToken(TOKEN_SIZE);
+			
+			// Send token to client
+			socket.send(createPacket((byte) Game.TOKEN_SERVED, token.getBytes()));
+			
+			// Create new game
+			Game game = new Game(open, maxPlayers, rounds, roundDuration);
+			game.addPlayer(socket, username.toString());
+			games.put(token, game);
+		} else if (cmd == Game.START_GAME) {
+			Game game = getGame(socket);
+
+			if (game != null) {
+
+			}
+		} else if (cmd == Game.DRAW_BUFFER || cmd == Game.END_DRAWING) {
+
 		}
 	}
 
-	private static byte[] createPacket(byte cmd, byte[] data) {
+	protected static byte[] createPacket(byte cmd, byte[] data) {
 		byte[] packet = new byte[data.length + 1];
 
 		packet[0] = cmd;
 
-		for (int i = 1; i <= data.length; i++) {
-			packet[i] = data[i];
+		for (int i = 0; i < data.length; i++) {
+			packet[i + 1] = data[i];
 		}
 
 		return packet;
