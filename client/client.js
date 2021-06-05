@@ -6,7 +6,13 @@ const START_GAME	= 4;	// -
 const PLAYER_JOIN	= 5;	// -
 
 const DRAW_BUFFER	= 20;	// point...
-const END_DRAWING	= 21;	// -
+const MOUSE_UP		= 21;	// -
+const SET_COLOR		= 22;	// r, g, b
+const SET_WIDTH		= 23;	// line width
+// DRAW_POINT
+// BUCKET
+
+const MSG			= 30;	// Chat message
 
 const JOIN_ERROR	= 201;	// reason
 const CREATE_ERROR	= 202;	// reason
@@ -32,14 +38,30 @@ server.onmessage = function(e) {
 
 		// Toggle to game view
 		showGameSection();
+
+		leaderboard = {};
 	} else if (cmd == PLAYER_JOIN) {
 		var name = "";
 		for (var i = 0; i < data.length - 1; i++) {
 			name += String.fromCharCode(data[i + 1]);
 		}
-		console.log("player: " + name);
+		
+		leaderboard[name] = 0;
+		displayLeaderboard();
 	} else if (cmd == DRAW_BUFFER) {
 		drawLineBuf(data.slice(1, data.length));
+	} else if (cmd == MOUSE_UP) {
+		mouseUp();
+	} else if (cmd == MSG) {
+		var msg = "";
+		for (var i = 0; i < data.length - 1; i++) {
+			msg += String.fromCharCode(data[i + 1]);
+		}
+		displayMessage(msg);
+	} else if (cmd == SET_COLOR) {
+		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
+	} else if (cmd == SET_WIDTH) {
+		ctx.lineWidth = data[1];
 	}
 };
 
@@ -84,6 +106,11 @@ function joinRandom() {
 }
 
 function createGame() {
+	if (username == '') {
+		console.log("username null XXXX")
+		return;
+	}
+
 	var packet = new ArrayBuffer(5 + username.length);
 	var view = new Uint8Array(packet);
 	view[0] = CREATE_GAME;
@@ -95,4 +122,28 @@ function createGame() {
 		view[i + 5] = username.charCodeAt(i);
 	}
 	sendToServer(packet);
+}
+
+var textinput = document.getElementById('textinput');
+
+function sendMessage() {
+	var msg = textinput.value;
+	if (msg == '') {
+		return;
+	}
+	textinput.value = '';
+	var value = username + ": " + msg;
+	var packet = new ArrayBuffer(1 + value.length);
+	var view = new Uint8Array(packet);
+	view[0] = MSG;
+	for (var i = 0; i < value.length; i++) {
+		view[i + 1] = value.charCodeAt(i);
+	}
+	sendToServer(packet);
+}
+
+var textarea = document.getElementById('textarea');
+
+function displayMessage(msg) {
+	textarea.append(msg + '\n');
 }

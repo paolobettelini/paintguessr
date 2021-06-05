@@ -11,11 +11,15 @@ public class Game {
 	public static final int JOIN_GAME		= 1;	// token, username
 	public static final int CREATE_GAME		= 2;	// public, max_players, rounds, round_duration, username
 	public static final int JOIN_RND		= 3;	// username
-	public static final int START_GAME		= 4;	// -
+	public static final int NEXT_ROUND		= 4;	// -
 	public static final int PLAYER_JOIN		= 5;	// -
 
 	public static final int DRAW_BUFFER		= 20;	// point...
-	public static final int END_DRAWING		= 21;	// -
+	public static final int MOUSE_UP		= 21;	// -
+	public static final int SET_COLOR		= 22;	// r, g, b
+	public static final int SET_WIDTH		= 23;	// line width
+
+	public static final int MSG				= 30;	// message
 
 	public static final int JOIN_ERROR		= 201;	// reason
 	public static final int CREATE_ERROR	= 202;	// reason
@@ -56,8 +60,35 @@ public class Game {
 		broadcast(createPlayerJoinedPacket(username));
 	}
 
+	public void messageFrom(WebSocket socket, byte[] data) {
+		String msg = new String(data, 1, data.length - 1);
+
+		// hasWonTurn
+		boolean status = players.get(socket).hasWonRound();
+		
+		if (!status && socket != drawing) { // && is word
+			// [...]
+			// return;
+		}
+
+		for (WebSocket player : players.keySet()) {
+			if (!status || players.get(player).hasWonRound()) {
+				player.send(data);
+				System.out.println("Sent to " + players.get(player).getUsername());
+			}
+		}
+	}
+
 	public int size() {
 		return players.size();
+	}
+
+	public boolean canJoin() {
+		return !hasStarted() && !isFull();
+	}
+
+	public boolean hasStarted() {
+		return currentRound != 0;
 	}
 
 	public boolean contains(WebSocket socket) {

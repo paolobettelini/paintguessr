@@ -70,17 +70,23 @@ public class GamesHandler {
 			}
 
 			socket.send(createPacket((byte) Game.JOIN_ERROR, "No games available".getBytes()));
-		} else if (cmd == Game.START_GAME) {
+		} else if (cmd == Game.NEXT_ROUND) {
 			Game game = getGame(socket);
 
 			if (game != null) {
 
 			}
-		} else if (cmd == Game.DRAW_BUFFER || cmd == Game.END_DRAWING) {
+		} else if (cmd == Game.DRAW_BUFFER || cmd == Game.MOUSE_UP || cmd == Game.SET_COLOR || cmd == Game.SET_WIDTH) {
 			Game game = getGame(socket);
 
 			if (game != null) {
 				game.broadcast(data);
+			}
+		} else if (cmd == Game.MSG) {
+			Game game = getGame(socket);
+
+			if (game != null) {
+				game.messageFrom(socket, data);
 			}
 		}
 	}

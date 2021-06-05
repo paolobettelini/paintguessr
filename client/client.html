@@ -18,6 +18,10 @@
 		#game {
 			display: none;
 		}
+		
+		#chat {
+			border: black;
+		}
 	</style>
 </head>
 <body>
@@ -66,7 +70,17 @@
 	</div>
 
 	<div id="game">
+		<div id="leaderboard"></div>
+		<input type="color" onchange="setColor(this.value)">
+		<input type="range" onchange="setWidth(this.value)">
 		<canvas id="canvas" width="500px" height="500px"></canvas>
+		
+		<div id="chat">
+			<textarea style="resize: none;" id="textarea" cols="30" rows="10" disabled></textarea>
+			<br>
+			<input id="textinput" type="text">
+			<button onclick="sendMessage()">send</button>
+		</div>
 	</div>
 	
 	<script src="info.js"></script>
