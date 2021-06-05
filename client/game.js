@@ -4,7 +4,10 @@ var width = canvas.width;
 var height = canvas.height;
 
 var dragging = false;
+var drawing = false;
 var leaderboard;
+
+var currentTurn = 0;
 
 function displayLeaderboard() {
 	var div = document.getElementById('leaderboard');
@@ -50,7 +53,7 @@ var byteBuffer = new Uint8Array(buffer);
 byteBuffer[0] = DRAW_BUFFER;
 
 canvas.onmousemove = e => {
-	if (dragging) {
+	if (drawing && dragging) {
 		if (counter % BLOCK_SIZE == 0 && counter != 0) {
 			sendToServer(byteBuffer);
 			//drawLineBuf(byteBuffer);
@@ -58,9 +61,9 @@ canvas.onmousemove = e => {
 		
 		var w = 65535 * (e.offsetX / width) | 0;
 		var h = 65535 * (e.offsetY / height) | 0;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w >> 8;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w >>> 8;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 2] = w & 0xFF;
-		byteBuffer[((counter % BLOCK_SIZE) << 2) + 3] = h >> 8;
+		byteBuffer[((counter % BLOCK_SIZE) << 2) + 3] = h >>> 8;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 4] = h & 0xFF;
 
 		++counter;

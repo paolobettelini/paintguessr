@@ -1,9 +1,11 @@
-const TOKEN_SERVED	= 0;	// token
+const GAME_SERVED	= 0;	// token, public, max_players, rounds, turn_duration
 const JOIN_GAME		= 1;	// token, username
-const CREATE_GAME	= 2;	// public, rounds, duration, max_players, username
+const CREATE_GAME	= 2;	// public, rounds, turn_duration, max_players, username
 const JOIN_RND		= 3		// username
-const START_GAME	= 4;	// -
+const START			= 4;	// -
 const PLAYER_JOIN	= 5;	// -
+const NEXT_TURN		= 6;	// -
+const YOURE_DRAWING	= 7;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
@@ -13,6 +15,7 @@ const SET_WIDTH		= 23;	// line width
 // BUCKET
 
 const MSG			= 30;	// Chat message
+const UPDATE_WORD	= 31;	// word
 
 const JOIN_ERROR	= 201;	// reason
 const CREATE_ERROR	= 202;	// reason
@@ -29,11 +32,17 @@ server.onmessage = function(e) {
 	var data = new Uint8Array(e.data);
 	var cmd = data[0];
 
-	if (cmd == TOKEN_SERVED) {
+	if (cmd == GAME_SERVED) {
 		var token = "";
 		for (var i = 0; i < 5; i++) {
 			token += String.fromCharCode(data[i + 1]);
 		}
+
+		//pub data[5]
+		//maxP data[5 + 1]
+		//rounds data[5 + 2]
+		//turnD data[5 + 3]
+
 		console.log("token served: " + token);
 
 		// Toggle to game view
@@ -62,6 +71,25 @@ server.onmessage = function(e) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
 		ctx.lineWidth = data[1];
+	} else if (cmd == UPDATE_WORD) {
+		var word = "";
+		for (var i = 0; i < data.length - 1; i++) {
+			word += String.fromCharCode(data[i + 1]);
+		}
+		console.log("The word is: " + word);
+	} else if (cmd == NEXT_TURN) {
+		console.log("turn: " + ++currentTurn);
+	} else if (cmd == YOURE_DRAWING) {
+		console.log("IM DRAWING YUUU");
+
+		setTimeout(() => {
+			drawing = true;
+			// enable features
+			
+			setTimeout(() => {
+				drawing = false;
+			}, turnDuration * 1000);
+		}, 3000);
 	}
 };
 
@@ -114,10 +142,10 @@ function createGame() {
 	var packet = new ArrayBuffer(5 + username.length);
 	var view = new Uint8Array(packet);
 	view[0] = CREATE_GAME;
-	view[1] = public ? ~0 : 0;
+	view[1] = public ? ~ 0 : 0;
 	view[2] = maxPlayers;
 	view[3] = rounds;
-	view[4] = roundDuration;
+	view[4] = turnDuration;
 	for (var i = 0; i < username.length; i++) {
 		view[i + 5] = username.charCodeAt(i);
 	}
@@ -143,6 +171,13 @@ function sendMessage() {
 }
 
 var textarea = document.getElementById('textarea');
+
+function start() {
+	var packet = new ArrayBuffer(1);
+	var view = new Uint8Array(packet);
+	view[0] = START
+	sendToServer(view);
+}
 
 function displayMessage(msg) {
 	textarea.append(msg + '\n');

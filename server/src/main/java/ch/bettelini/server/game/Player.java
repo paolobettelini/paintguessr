@@ -3,33 +3,40 @@ package ch.bettelini.server.game;
 public class Player {
 
 	private String username;
-	private int score;
-	private boolean wonRound;
+	private boolean wonTurn, alreadyDrawn;
 
 	public Player(String username) {
 		this.username = username;
-		this.score = 0;
-		this.wonRound = false;
+		this.wonTurn = false;
+		this.alreadyDrawn = false;
 	}
 
 	public String getUsername() {
 		return username;
 	}
 
-	public int getScore() {
-		return score;
+	public boolean hasWonTurn() {
+		return wonTurn;
 	}
 
-	public void addPoints(int points) {
-		this.score += points;
+	public boolean hasAlreadyDrawn() {
+		return alreadyDrawn;
 	}
 
-	public boolean hasWonRound() {
-		return wonRound;
+	public void nextTurn() {
+		this.wonTurn = false;
 	}
 
 	public void nextRound() {
-		this.wonRound = false;
+		this.alreadyDrawn = false;
+	}
+
+	public void hasAlreadyDrawn(boolean alreadyDrawn) {
+		this.alreadyDrawn = alreadyDrawn;
+	}
+	
+	public void hasWonTurn(boolean wonTurn) {
+		this.wonTurn = wonTurn;
 	}
 
 }
