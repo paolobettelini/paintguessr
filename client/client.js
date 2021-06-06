@@ -5,8 +5,7 @@ const JOIN_RND		= 3		// username
 const START			= 4;	// -
 const PLAYER_JOIN	= 5;	// username
 const PLAYER_LEFT	= 6;	// username
-const NEXT_TURN		= 7;	// -
-const YOURE_DRAWING	= 8;	// -
+const NEXT_TURN		= 7;	// drawing, word
 
 const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
@@ -16,7 +15,6 @@ const SET_WIDTH		= 23;	// line width
 // BUCKET
 
 const MSG			= 30;	// Chat message
-const UPDATE_WORD	= 31;	// word
 
 const JOIN_ERROR	= 201;	// reason
 
@@ -37,10 +35,13 @@ server.onmessage = function(e) {
 			token += String.fromCharCode(data[i + 1]);
 		}
 
-		//pub data[5]
-		//maxP data[5 + 1]
-		//rounds data[5 + 2]
-		//turnD data[5 + 3]
+		//public = data[5 + 1]
+		//maxP = data[5 + 2]
+		rounds = data[5 + 3] & 0xFF;
+		turnDuration = data[5 + 4] & 0xFF;
+		
+		console.log("rounds: " + rounds);
+		console.log("turnDuration: " + turnDuration);
 
 		console.log("token served: " + token);
 
@@ -70,23 +71,26 @@ server.onmessage = function(e) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
 		ctx.lineWidth = data[1];
-	} else if (cmd == UPDATE_WORD) {
-		var word = "";
-		for (var i = 0; i < data.length - 1; i++) {
-			word += String.fromCharCode(data[i + 1]);
-		}
-		console.log("The word is: " + word);
 	} else if (cmd == NEXT_TURN) {
-		console.log("turn: " + ++currentTurn);
-	} else if (cmd == YOURE_DRAWING) {
-		setTimeout(() => {
-			drawing = true;
-			// enable features
-			
+		++currentTurn;
+		drawing = data[1] != 0;
+		var word = "";
+		for (var i = 0; i < data.length - 2; i++) {
+			word += String.fromCharCode(data[i + 2]);
+		}
+
+		console.log("turn: " + currentTurn + "\tdrawing: " + drawing);
+
+		if (drawing) {
 			setTimeout(() => {
-				drawing = false;
-			}, turnDuration * 1000);
-		}, 3000);
+				// enable features
+				drawing = true;
+				
+				setTimeout(() => {
+					drawing = false;
+				}, turnDuration * 1000);
+			}, 3000);
+		}
 	} else if (cmd == JOIN_ERROR) {
 		var msg = "";
 		for (var i = 0; i < data.length - 1; i++) {
@@ -98,11 +102,11 @@ server.onmessage = function(e) {
 };
 
 server.onclose = function(e) {
-	console.log("Connection closed", e);
+	alert('Connection error');
 };
 
 server.onerror = function(e) {
-	console.log("WebSocket Error: ", e);
+	alert('Connection error');
 };
 
 function sendToServer(data) {

@@ -47,7 +47,7 @@ public class Game {
 		players.put(socket, new Player(username));
 
 		// Notify everyone
-		socket.send(Protocol.createPlayerJoinedPacket(username.getBytes()));
+		broadcast(Protocol.createPlayerJoinedPacket(username.getBytes()));
 
 		if (players.size() == maxPlayers) {
 			start();
@@ -75,12 +75,8 @@ public class Game {
 	}
 
 	public void start(WebSocket from) {
-		if (from == admin) {
-			if (players.size() > 1) {
-				start();
-			} else {
-				// Send error message
-			}
+		if (from == admin && players.size() > 1 && !hasStarted()) {
+			start();
 		}
 	}
 
@@ -94,7 +90,7 @@ public class Game {
 			currentTurn = 1;
 
 			if (++currentRound > rounds) {
-				System.out.println("Game ended");
+				GamesHandler.delete(this);
 				return;
 			}
 
@@ -120,20 +116,19 @@ public class Game {
 		Player _drawing = players.get(drawing);
 		_drawing.hasAlreadyDrawn(true);
 		_drawing.hasWonTurn(true);
-		drawing.send(new byte[]{(byte)Protocol.YOURE_DRAWING});
 		
 		// Choose word
 		this.currentWord = "parola 1";
-		byte[] obfuscated = obfuscate(currentWord).getBytes();
 
-		drawing.send(Protocol.createUpdateWordPacket(currentWord.getBytes()));
+		byte[] packet = Protocol.createNextTurnPacket(false, obfuscate(currentWord).getBytes());
+		byte[] drawingPacket = Protocol.createNextTurnPacket(true, currentWord.getBytes());
+		
+		drawing.send(drawingPacket);
 
 		for (WebSocket player : players.keySet()) {
 			if (player != drawing) {
-				drawing.send(Protocol.createUpdateWordPacket(obfuscated));
+				player.send(packet);
 			}
-
-			player.send(new byte[]{(byte)Protocol.NEXT_TURN});
 		}
 
 		currentSchedulerTask = new TimerTask(){
@@ -145,7 +140,7 @@ public class Game {
 			
 		};
 
-		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1 + 3000);
+		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1000 + 3000);
 	}
 
 	public int size() {

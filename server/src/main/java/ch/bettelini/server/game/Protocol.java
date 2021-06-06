@@ -2,7 +2,14 @@ package ch.bettelini.server.game;
 
 public class Protocol {
 	
+	/**
+	 * The charset used to generate tokens.
+	 */
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	
+	/**
+	 * The token length.
+	 */
 	public static final int TOKEN_SIZE 		= 5;
 
 	public static final int GAME_SERVED		= 0;	// token, public, max_players, rounds, turn_duration
@@ -12,8 +19,7 @@ public class Protocol {
 	public static final int START			= 4;	// -
 	public static final int PLAYER_JOIN		= 5;	// username
 	public static final int PLAYER_LEFT		= 6;	// username
-	public static final int NEXT_TURN		= 7;	// -
-	public static final int YOURE_DRAWING	= 8;	// -
+	public static final int NEXT_TURN		= 7;	// drawing, word
 
 	public static final int DRAW_BUFFER		= 20;	// point...
 	public static final int MOUSE_UP		= 21;	// -
@@ -21,7 +27,6 @@ public class Protocol {
 	public static final int SET_WIDTH		= 23;	// line width
 
 	public static final int MSG				= 30;	// message
-	public static final int UPDATE_WORD		= 31;	// word
 
 	public static final int JOIN_ERROR		= 201;	// reason
 
@@ -29,16 +34,17 @@ public class Protocol {
 		return createPacket((byte) JOIN_ERROR, reason);
 	}
 
-	public static byte[] createUpdateWordPacket(byte[] word) {
-		return createPacket((byte) UPDATE_WORD, word);
-	}
+	public static byte[] createNextTurnPacket(boolean drawing, byte[] word) {
+		byte[] packet = new byte[word.length + 2];
 
-	public static byte[] createYouReDrawingPacket() {
-		return new byte[] { (byte) YOURE_DRAWING };
-	}
-	
-	public static byte[] createNextTurnPaclet() {
-		return new byte[] { (byte) NEXT_TURN };
+		packet[0] = (byte) NEXT_TURN;
+		packet[1] = (byte) (drawing ? ~0 : 0);
+
+		for (int i = 0; i < word.length; i++) {
+			packet[i + 2] = word[i];
+		}
+
+		return packet;
 	}
 
 	public static byte[] createPlayerJoinedPacket(byte[] username) {

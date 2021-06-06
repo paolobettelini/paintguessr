@@ -121,6 +121,15 @@ public class GamesHandler {
 		}
 	}
 
+	static void delete(Game game) {
+		for (String token : games.keySet()) {
+			if (games.get(token) == game) {
+				game.release();
+				games.remove(token);
+			}
+		}
+	}
+
 	private static Game getGame(WebSocket socket) {
 		for (Game game : games.values()) {
 			if (game.contains(socket)) {
