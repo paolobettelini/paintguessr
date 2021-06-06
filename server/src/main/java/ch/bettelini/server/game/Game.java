@@ -6,6 +6,8 @@ import java.util.TimerTask;
 
 import org.java_websocket.WebSocket;
 
+import ch.bettelini.server.game.utils.Words;
+
 public class Game {
 
 	private Map<WebSocket, Player> players;
@@ -59,20 +61,21 @@ public class Game {
 		Player sender = players.get(socket);
 		boolean status = sender.hasWonTurn();
 
-		// Remove '<username>: '
-		String msg = new String(data, 1, data.length - 1).substring(sender.getUsername().length() + 2);
+		String msg = new String(data, 1, data.length - 1);
 
 		if (currentWord != null && !status && currentWord.equalsIgnoreCase(msg)) {
-			int amount = (int) (System.currentTimeMillis() - roundStartTime - 3000) / turnDuration / 10 + 100;
+			int amount = 100 - (int) (System.currentTimeMillis() - roundStartTime - 3000) / turnDuration / 10;
 			broadcast(Protocol.createAddScorePacket(amount, sender.getUsername().getBytes()));
 			
 			sender.hasWonTurn(true);
 			return;
 		}
 
+		byte[] packet = Protocol.createMessagePacket((sender.getUsername() + ": " + msg).getBytes());
+
 		for (WebSocket player : players.keySet()) {
 			if (!status || players.get(player).hasWonTurn()) {
-				player.send(data);
+				player.send(packet);
 			}
 		}
 	}
@@ -121,9 +124,9 @@ public class Game {
 		_drawing.hasWonTurn(true);
 		
 		// Choose word
-		this.currentWord = "parola 1";
+		this.currentWord = Words.random(); // list of old words
 
-		byte[] packet = Protocol.createNextTurnPacket(false, obfuscate(currentWord).getBytes());
+		byte[] packet = Protocol.createNextTurnPacket(false, Words.obfuscate(currentWord).getBytes());
 		byte[] drawingPacket = Protocol.createNextTurnPacket(true, currentWord.getBytes());
 		
 		drawing.send(drawingPacket);
@@ -195,16 +198,6 @@ public class Game {
 		if (currentSchedulerTask != null) {
 			currentSchedulerTask.cancel();
 		}
-	}
-
-	private static String obfuscate(String word) {
-		StringBuilder builder = new StringBuilder();
-
-		for (int i = 0; i < word.length(); i++) {
-			builder.append(word.charAt(i) == ' ' ? ' ' : '_');
-		}
-
-		return builder.toString();
 	}
 
     public int getRounds() {

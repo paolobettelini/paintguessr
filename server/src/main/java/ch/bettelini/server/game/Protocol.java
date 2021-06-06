@@ -31,6 +31,10 @@ public class Protocol {
 
 	public static final int JOIN_ERROR		= 201;	// reason
 
+	public static byte[] createMessagePacket(byte[] message) {
+		return createPacket((byte) MSG, message);
+	}
+
 	public static byte[] createJoinErrorPacket(byte[] reason) {
 		return createPacket((byte) JOIN_ERROR, reason);
 	}

@@ -179,12 +179,11 @@ function sendMessage() {
 		return;
 	}
 	textinput.value = '';
-	var value = username + ": " + msg;
-	var packet = new ArrayBuffer(1 + value.length);
+	var packet = new ArrayBuffer(1 + msg.length);
 	var view = new Uint8Array(packet);
 	view[0] = MSG;
-	for (var i = 0; i < value.length; i++) {
-		view[i + 1] = value.charCodeAt(i);
+	for (var i = 0; i < msg.length; i++) {
+		view[i + 1] = msg.charCodeAt(i);
 	}
 	sendToServer(packet);
 }
