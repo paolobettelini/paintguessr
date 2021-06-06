@@ -11,10 +11,9 @@ const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
 const SET_COLOR		= 22;	// r, g, b
 const SET_WIDTH		= 23;	// line width
-// DRAW_POINT
-// BUCKET
 
 const MSG			= 30;	// Chat message
+const ADD_SCORE		= 31;	// amount, username
 
 const JOIN_ERROR	= 201;	// reason
 
@@ -79,6 +78,9 @@ server.onmessage = function(e) {
 			word += String.fromCharCode(data[i + 2]);
 		}
 
+		ctx.fillStyle = "white";
+		ctx.fillRect(0, 0, width, height);
+
 		console.log("turn: " + currentTurn + "\tdrawing: " + drawing);
 
 		if (drawing) {
@@ -98,6 +100,15 @@ server.onmessage = function(e) {
 		}
 
 		alert(msg);
+	} else if (cmd == ADD_SCORE) {
+		var amount = data[1] & 0xFF;
+		var name = "";
+		for (var i = 0; i < data.length - 2; i++) {
+			name += String.fromCharCode(data[i + 2]);
+		}
+
+		leaderboard[name] += amount;
+		displayLeaderboard();
 	}
 };
 

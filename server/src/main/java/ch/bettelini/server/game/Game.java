@@ -19,6 +19,7 @@ public class Game {
 
 	private int currentRound;
 	private int currentTurn;
+	private long roundStartTime;
 	private String currentWord;
 	private TimerTask currentSchedulerTask;
 
@@ -55,15 +56,17 @@ public class Game {
 	}
 
 	public void messageFrom(WebSocket socket, byte[] data) {
-		String msg = new String(data, 1, data.length - 1);
+		Player sender = players.get(socket);
+		boolean status = sender.hasWonTurn();
 
-		boolean status = players.get(socket).hasWonTurn();
-		
-		if (currentWord != null && !status && currentWord.equals(msg)) {
-			// broadcast(data); notify victory
+		// Remove '<username>: '
+		String msg = new String(data, 1, data.length - 1).substring(sender.getUsername().length() + 2);
+
+		if (currentWord != null && !status && currentWord.equalsIgnoreCase(msg)) {
+			int amount = (int) (System.currentTimeMillis() - roundStartTime - 3000) / turnDuration / 10 + 100;
+			broadcast(Protocol.createAddScorePacket(amount, sender.getUsername().getBytes()));
 			
-			players.get(socket).hasWonTurn(true);
-
+			sender.hasWonTurn(true);
 			return;
 		}
 
@@ -141,6 +144,7 @@ public class Game {
 		};
 
 		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1000 + 3000);
+		roundStartTime = System.currentTimeMillis();
 	}
 
 	public int size() {

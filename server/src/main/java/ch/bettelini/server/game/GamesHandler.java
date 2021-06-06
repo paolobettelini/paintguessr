@@ -55,7 +55,7 @@ public class GamesHandler {
 				game.getRounds(),
 				game.getTurnDuration()));
 			
-				game.addPlayer(socket, username);
+			game.addPlayer(socket, username);
 		} else if (cmd == Protocol.CREATE_GAME) {
 			// Read packet data
 			boolean open = data[1] != 0;

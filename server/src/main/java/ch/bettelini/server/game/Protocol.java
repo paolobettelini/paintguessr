@@ -27,11 +27,25 @@ public class Protocol {
 	public static final int SET_WIDTH		= 23;	// line width
 
 	public static final int MSG				= 30;	// message
+	public static final int ADD_SCORE		= 31;	// amount, username
 
 	public static final int JOIN_ERROR		= 201;	// reason
 
 	public static byte[] createJoinErrorPacket(byte[] reason) {
 		return createPacket((byte) JOIN_ERROR, reason);
+	}
+
+	public static byte[] createAddScorePacket(int amount, byte[] username) {
+		byte[] packet = new byte[username.length + 2];
+
+		packet[0] = ADD_SCORE;
+		packet[1] = (byte) amount;
+
+		for (int i = 0; i < username.length; i++) {
+			packet[i + 2] = username[i];
+		}
+
+		return packet;
 	}
 
 	public static byte[] createNextTurnPacket(boolean drawing, byte[] word) {
