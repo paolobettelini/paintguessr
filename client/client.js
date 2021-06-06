@@ -3,9 +3,10 @@ const JOIN_GAME		= 1;	// token, username
 const CREATE_GAME	= 2;	// public, rounds, turn_duration, max_players, username
 const JOIN_RND		= 3		// username
 const START			= 4;	// -
-const PLAYER_JOIN	= 5;	// -
-const NEXT_TURN		= 6;	// -
-const YOURE_DRAWING	= 7;	// -
+const PLAYER_JOIN	= 5;	// username
+const PLAYER_LEFT	= 6;	// username
+const NEXT_TURN		= 7;	// -
+const YOURE_DRAWING	= 8;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
@@ -18,8 +19,6 @@ const MSG			= 30;	// Chat message
 const UPDATE_WORD	= 31;	// word
 
 const JOIN_ERROR	= 201;	// reason
-const CREATE_ERROR	= 202;	// reason
-const START_ERROR	= 203;	// reason
 
 const server = new WebSocket('ws://127.0.0.1:3333');
 server.binaryType = "arraybuffer";
@@ -80,8 +79,6 @@ server.onmessage = function(e) {
 	} else if (cmd == NEXT_TURN) {
 		console.log("turn: " + ++currentTurn);
 	} else if (cmd == YOURE_DRAWING) {
-		console.log("IM DRAWING YUUU");
-
 		setTimeout(() => {
 			drawing = true;
 			// enable features
@@ -90,6 +87,13 @@ server.onmessage = function(e) {
 				drawing = false;
 			}, turnDuration * 1000);
 		}, 3000);
+	} else if (cmd == JOIN_ERROR) {
+		var msg = "";
+		for (var i = 0; i < data.length - 1; i++) {
+			msg += String.fromCharCode(data[i + 1]);
+		}
+
+		alert(msg);
 	}
 };
 

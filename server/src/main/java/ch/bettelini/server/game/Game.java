@@ -8,27 +8,6 @@ import org.java_websocket.WebSocket;
 
 public class Game {
 
-	public static final int GAME_SERVED		= 0;	// token, public, max_players, rounds, turn_duration
-	public static final int JOIN_GAME		= 1;	// token, username
-	public static final int CREATE_GAME		= 2;	// public, max_players, rounds, turn_duration, username
-	public static final int JOIN_RND		= 3;	// username
-	public static final int START			= 4;	// -
-	public static final int PLAYER_JOIN		= 5;	// -
-	public static final int NEXT_TURN		= 6;	// -
-	public static final int YOURE_DRAWING	= 7;	// -
-
-	public static final int DRAW_BUFFER		= 20;	// point...
-	public static final int MOUSE_UP		= 21;	// -
-	public static final int SET_COLOR		= 22;	// r, g, b
-	public static final int SET_WIDTH		= 23;	// line width
-
-	public static final int MSG				= 30;	// message
-	public static final int UPDATE_WORD		= 31;	// word
-
-	public static final int JOIN_ERROR		= 201;	// reason
-	public static final int CREATE_ERROR	= 202;	// reason
-	public static final int START_ERROR		= 203;	// reason
-
 	private Map<WebSocket, Player> players;
 	
 	private WebSocket drawing, admin;
@@ -58,7 +37,7 @@ public class Game {
 	public void addPlayer(WebSocket socket, String username) {
 		// Send all previous player names
 		for (Player player : players.values()) {
-			socket.send(createPlayerJoinedPacket(player.getUsername()));
+			socket.send(Protocol.createPlayerJoinedPacket(player.getUsername().getBytes()));
 		}
 		
 		if (players.size() == 0) {
@@ -68,7 +47,7 @@ public class Game {
 		players.put(socket, new Player(username));
 
 		// Notify everyone
-		broadcast(createPlayerJoinedPacket(username));
+		socket.send(Protocol.createPlayerJoinedPacket(username.getBytes()));
 
 		if (players.size() == maxPlayers) {
 			start();
@@ -81,7 +60,7 @@ public class Game {
 		boolean status = players.get(socket).hasWonTurn();
 		
 		if (currentWord != null && !status && currentWord.equals(msg)) {
-			// broadcast(data); NOTIFY VICRTORy
+			// broadcast(data); notify victory
 			
 			players.get(socket).hasWonTurn(true);
 
@@ -141,30 +120,32 @@ public class Game {
 		Player _drawing = players.get(drawing);
 		_drawing.hasAlreadyDrawn(true);
 		_drawing.hasWonTurn(true);
-		drawing.send(new byte[]{(byte)Game.YOURE_DRAWING});
+		drawing.send(new byte[]{(byte)Protocol.YOURE_DRAWING});
 		
 		// Choose word
 		this.currentWord = "parola 1";
 		byte[] obfuscated = obfuscate(currentWord).getBytes();
 
-		drawing.send(createPacket((byte)Game.UPDATE_WORD, currentWord.getBytes()));
+		drawing.send(Protocol.createUpdateWordPacket(currentWord.getBytes()));
 
 		for (WebSocket player : players.keySet()) {
 			if (player != drawing) {
-				player.send(createPacket((byte)Game.UPDATE_WORD, obfuscated));
+				drawing.send(Protocol.createUpdateWordPacket(obfuscated));
 			}
 
-			player.send(new byte[]{(byte)Game.NEXT_TURN});
+			player.send(new byte[]{(byte)Protocol.NEXT_TURN});
 		}
 
-		GamesHandler.scheduler.schedule(new TimerTask(){
+		currentSchedulerTask = new TimerTask(){
 
 			@Override
 			public void run() {
 				nextTurn();
 			}
 			
-		}, turnDuration * 1 + 3000);
+		};
+
+		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1 + 3000);
 	}
 
 	public int size() {
@@ -213,12 +194,8 @@ public class Game {
 
 	public void release() {
 		if (currentSchedulerTask != null) {
-			// cancel task
+			currentSchedulerTask.cancel();
 		}
-	}
-
-	private static byte[] createPlayerJoinedPacket(String username) {
-		return createPacket((byte) PLAYER_JOIN, username.getBytes());
 	}
 
 	private static String obfuscate(String word) {
@@ -229,18 +206,6 @@ public class Game {
 		}
 
 		return builder.toString();
-	}
-
-	protected static byte[] createPacket(byte cmd, byte[] data) {
-		byte[] packet = new byte[data.length + 1];
-
-		packet[0] = cmd;
-
-		for (int i = 0; i < data.length; i++) {
-			packet[i + 1] = data[i];
-		}
-
-		return packet;
 	}
 
     public int getRounds() {
