@@ -8,6 +8,8 @@ var drawing = false;
 var leaderboard;
 
 var currentTurn = 0;
+var creator = false;
+var players = 0;
 
 function displayLeaderboard() {
 	var div = document.getElementById('leaderboard');

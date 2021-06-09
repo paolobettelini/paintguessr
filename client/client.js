@@ -34,15 +34,20 @@ server.onmessage = function(e) {
 			token += String.fromCharCode(data[i + 1]);
 		}
 
-		//public = data[5 + 1]
-		//maxP = data[5 + 2]
+		//public = data[5 + 1] != 0;
+		maxPlayers = data[5 + 2] & 0xFF
 		rounds = data[5 + 3] & 0xFF;
 		turnDuration = data[5 + 4] & 0xFF;
 		
 		console.log("rounds: " + rounds);
 		console.log("turnDuration: " + turnDuration);
 
-		console.log("token served: " + token);
+		document.getElementById('token').innerHTML = "Token: " + token;
+
+		if (creator) {
+			document.getElementById('startButton').style.display = 'block';
+			document.getElementById('startButton').disabled = true;
+		}
 
 		// Toggle to game view
 		showGameSection();
@@ -53,7 +58,13 @@ server.onmessage = function(e) {
 		for (var i = 0; i < data.length - 1; i++) {
 			name += String.fromCharCode(data[i + 1]);
 		}
-		
+
+		if (++players > 1) {
+			document.getElementById('startButton').disabled = false;
+		}
+
+		setStatus("Waiting... (" + players + "/" + maxPlayers + ")");
+
 		leaderboard[name] = 0;
 		displayLeaderboard();
 	} else if (cmd == DRAW_BUFFER) {
@@ -78,10 +89,12 @@ server.onmessage = function(e) {
 			word += String.fromCharCode(data[i + 2]);
 		}
 
+		// clear canvas
 		ctx.fillStyle = "white";
 		ctx.fillRect(0, 0, width, height);
 
-		console.log("turn: " + currentTurn + "\tdrawing: " + drawing);
+		document.getElementById('word').innerHTML = "Word: " + word;
+		setStatus("Playing... " + (currentTurn / maxPlayers | 0));
 
 		if (drawing) {
 			setTimeout(() => {
@@ -113,11 +126,11 @@ server.onmessage = function(e) {
 };
 
 server.onclose = function(e) {
-	alert('Connection error');
+
 };
 
 server.onerror = function(e) {
-	alert('Connection error');
+	//alert('Connection error');
 };
 
 function sendToServer(data) {
@@ -126,9 +139,11 @@ function sendToServer(data) {
 
 function joinGame(token) {
 	if (username.length == 0) {
-		console.log("invalid username");
+		alert("Username cannot be empty")
 		return;
 	}
+
+	creator = false;
 
 	var packet = new ArrayBuffer(1 + 5 + username.length);
 	var view = new Uint8Array(packet);
@@ -143,6 +158,13 @@ function joinGame(token) {
 }
 
 function joinRandom() {
+	if (username.length == 0) {
+		alert("Username cannot be empty")
+		return;
+	}
+
+	creator = false;
+
 	var packet = new ArrayBuffer(1 + username.length);
 	var view = new Uint8Array(packet);
 	view[0] = JOIN_RND;
@@ -154,9 +176,11 @@ function joinRandom() {
 
 function createGame() {
 	if (username == '') {
-		console.log("username null XXXX")
+		alert("Username cannot be empty")
 		return;
 	}
+
+	creator = true;
 
 	var packet = new ArrayBuffer(5 + username.length);
 	var view = new Uint8Array(packet);
@@ -199,4 +223,8 @@ function start() {
 
 function displayMessage(msg) {
 	textarea.append(msg + '\n');
+}
+
+function setStatus(status) {
+	document.getElementById('status').innerHTML = status;
 }

@@ -17,6 +17,9 @@ public class Server extends WebSocketServer {
 
 	public Server(InetSocketAddress address) {
 		super(address);
+
+		try { Class.forName("ch.bettelini.server.game.GamesHandler"); }
+		catch (ClassNotFoundException e) { e.printStackTrace(); }
 	}
 
 	@Override

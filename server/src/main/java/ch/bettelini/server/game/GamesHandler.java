@@ -17,6 +17,9 @@ public class GamesHandler {
 	static {
 		games = new HashMap<>();
 		scheduler = new Timer();
+
+		try { Class.forName("ch.bettelini.server.game.utils.Words"); }
+		catch (ClassNotFoundException e) { e.printStackTrace(); }
 	}
 
 	public static void processRequest(WebSocket socket, ByteBuffer buff) {

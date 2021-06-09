@@ -1,5 +1,5 @@
 var maxPlayersDisplay = document.getElementById('maxPlayersDisplay');
-var publicRadio = document.getElementById('public');
+var publicRadio = document.getElementById('option-1');
 var roundsDisplay = document.getElementById('roundsDisplay');
 var turnDurationDisplay = document.getElementById('turnDurationDisplay');
 
@@ -20,6 +20,7 @@ function setMaxPlayers(v) {
 
 function updateVisibility() {
     public = publicRadio.checked;
+    console.log(public);
 }
 
 function setRounds(v) {

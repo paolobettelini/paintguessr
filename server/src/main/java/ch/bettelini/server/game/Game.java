@@ -124,7 +124,8 @@ public class Game {
 		_drawing.hasWonTurn(true);
 		
 		// Choose word
-		this.currentWord = Words.random(); // list of old words
+		//this.currentWord = Words.random();
+		this.currentWord = "Muggiasca";
 
 		byte[] packet = Protocol.createNextTurnPacket(false, Words.obfuscate(currentWord).getBytes());
 		byte[] drawingPacket = Protocol.createNextTurnPacket(true, currentWord.getBytes());

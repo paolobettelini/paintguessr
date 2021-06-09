@@ -10,10 +10,10 @@ public class Words {
 
 	static {
 		try {
-			List<String> list = Files.readAllLines(Path.of("..", "..", "..", "..", "..", "..", "resources", "words.txt"));
-			words = list.toArray(new String[list.size()]);
+			//List<String> list = Files.readAllLines(Path.of(".\\..\\..\\..\\..\\..\\..\\resources\\words.txt"));
+			//words = list.toArray(new String[list.size()]);
 		} catch (Exception e) {
-			System.out.println("Error while reading words.txt");
+			System.out.println("Error whilst reading words.txt");
 			System.exit(0);
 		}
 	}
