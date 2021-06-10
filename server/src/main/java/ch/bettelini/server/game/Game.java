@@ -73,11 +73,14 @@ public class Game {
 		// Notify everyone
 		broadcast(Protocol.createPlayerJoinedPacket(username.getBytes()));
 
-		GamesHandler.log();
-
+		
 		if (players.size() == maxPlayers) {
 			start();
 		}
+
+		System.out.println(players.size());
+		
+		GamesHandler.log();
 	}
 
 	public void messageFrom(WebSocket socket, byte[] data) {
@@ -92,7 +95,10 @@ public class Game {
 			
 			sender.hasWonTurn(true);
 
-			// check if everyone won
+			if (isTurnComplete()) {
+				release();
+				nextTurn();
+			}
 
 			return;
 		}
@@ -104,6 +110,16 @@ public class Game {
 				player.send(packet);
 			}
 		}
+	}
+
+	private boolean isTurnComplete() {
+		for (Player player : players.values()) {
+			if (!player.hasWonTurn()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public void start(WebSocket from) {
@@ -151,7 +167,7 @@ public class Game {
 		
 		// Choose word
 		//this.currentWord = Words.random();
-		this.currentWord = "Muggiasca";
+		this.currentWord = Words.random();
 
 		byte[] packet = Protocol.createNextTurnPacket(false, Words.obfuscate(currentWord).getBytes());
 		byte[] drawingPacket = Protocol.createNextTurnPacket(true, currentWord.getBytes());

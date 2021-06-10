@@ -8,11 +8,15 @@ public class Words {
 	
 	private static String[] words;
 
+	private static final String FILENAME = "words.txt";
+
 	static {
 		try {
-			//List<String> list = Files.readAllLines(Path.of(".\\..\\..\\..\\..\\..\\..\\resources\\words.txt"));
-			//words = list.toArray(new String[list.size()]);
+			Path path = Path.of(Words.class.getResource("/" + FILENAME).toURI());
+			List<String> list = Files.readAllLines(path);
+			words = list.toArray(new String[list.size()]);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Error whilst reading words.txt");
 			System.exit(0);
 		}

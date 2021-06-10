@@ -58,7 +58,7 @@ canvas.onmousemove = e => {
 	if (drawing && dragging) {
 		if (counter % BLOCK_SIZE == 0 && counter != 0) {
 			sendToServer(byteBuffer);
-			drawLineBuf(byteBuffer);
+			drawLineBuf(byteBuffer.slice(1, byteBuffer.length));
 		}
 		
 		var w = 65535 * (e.offsetX / width) | 0;
@@ -82,8 +82,9 @@ var initLine = true;
 
 canvas.onmouseup = e => {
 	if (counter % BLOCK_SIZE != 0) { // flush remaining data
-		// slice it
-		//sendToServer(packet)
+		//var v = 1 + ((counter % BLOCK_SIZE) << 2);
+		//sendToServer(byteBuffer.slice(0, v))
+		//drawLineBuf(byteBuffer.slice(1, v))
 	}
 	
 	mouseUp();

@@ -44,7 +44,7 @@ server.onmessage = function(e) {
 		console.log("rounds: " + rounds);
 		console.log("turnDuration: " + turnDuration);
 
-		document.getElementById('token').innerHTML = "Token: [" + token + "]";
+		document.getElementById('token').innerHTML = "Token: " + token + "";
 
 		if (creator) {
 			document.getElementById('startButton').style.display = 'block';
@@ -97,6 +97,8 @@ server.onmessage = function(e) {
 
 		document.getElementById('word').innerHTML = "Word: " + word;
 		setStatus("Playing... " + (currentTurn / maxPlayers | 0));
+
+		mouseUp();
 
 		if (drawing) {
 			setTimeout(() => {

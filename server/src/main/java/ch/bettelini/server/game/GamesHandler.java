@@ -166,10 +166,11 @@ public class GamesHandler {
 	}
 
 	protected static void log() {
-		for (String token : games.keySet()) {
-			System.out.println(token + "\t" + games.get(token).size() + " players");
+		StringBuilder builder = new StringBuilder("Players per game:\t");
+		for (Game game : games.values()) {
+			builder.append(game.size() + "\t");
 		}
-		System.out.println("-------------------------------");
+		System.out.println(builder.toString());
 	}
 
 }
