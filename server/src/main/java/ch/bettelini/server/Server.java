@@ -31,8 +31,8 @@ public class Server extends WebSocketServer {
 	}
 
 	@Override
-	public void onMessage(WebSocket socket, ByteBuffer buff) {
-		GamesHandler.processRequest(socket, buff);
+	public void onMessage(WebSocket client, ByteBuffer buff) {
+		GamesHandler.processRequest(client, buff);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class Server extends WebSocketServer {
 
 	@Override
 	public void onClose(WebSocket client, int code, String reason, boolean remote) {
-
+		GamesHandler.removeSocket(client);
 	}
 
 	@Override

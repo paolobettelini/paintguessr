@@ -58,7 +58,7 @@ canvas.onmousemove = e => {
 	if (drawing && dragging) {
 		if (counter % BLOCK_SIZE == 0 && counter != 0) {
 			sendToServer(byteBuffer);
-			//drawLineBuf(byteBuffer);
+			drawLineBuf(byteBuffer);
 		}
 		
 		var w = 65535 * (e.offsetX / width) | 0;

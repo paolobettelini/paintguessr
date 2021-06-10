@@ -18,6 +18,7 @@ public class GamesHandler {
 		games = new HashMap<>();
 		scheduler = new Timer();
 
+		// load Words class
 		try { Class.forName("ch.bettelini.server.game.utils.Words"); }
 		catch (ClassNotFoundException e) { e.printStackTrace(); }
 	}
@@ -30,97 +31,22 @@ public class GamesHandler {
 		byte[] data = buff.array();
 		int cmd = data[0] & 0xFF;
 
-		if (cmd == Protocol.JOIN_GAME) {
-			String token = new String(data, 1, TOKEN_SIZE);
-
-			if (!games.containsKey(token)) {
-				socket.send(Protocol.createJoinErrorPacket("Invalid Token".getBytes()));
-				return;
+		Game game = getGame(socket);
+		
+		if (game == null) {
+			switch (cmd) {
+				case Protocol.CREATE_GAME:
+					createGame(socket, data);
+					break;
+				case Protocol.JOIN_GAME:
+					joinGame(socket, data);
+					break;
+				case Protocol.JOIN_RND:
+					joinRandom(socket, data);
+					break;
 			}
-
-			Game game = games.get(token);
-
-			String username = new String(data, TOKEN_SIZE + 1, data.length - TOKEN_SIZE - 1);
-			
-			if (username.isBlank() || username.isEmpty()) { // regex check
-				return;
-			}
-
-			if (game.contains(username)) {
-				socket.send(Protocol.createJoinErrorPacket("This username already exists in this game".getBytes()));
-				return;
-			}
-
-			socket.send(Protocol.createGameServedPacket(
-				token.getBytes(),
-				game.isPublic(),
-				game.getMaxPlayers(),
-				game.getRounds(),
-				game.getTurnDuration()));
-			
-			game.addPlayer(socket, username);
-		} else if (cmd == Protocol.CREATE_GAME) {
-			// Read packet data
-			boolean open = data[1] != 0;
-			int maxPlayers = data[2] & 0xFF;
-			int rounds = data[3] & 0xFF;
-			int turnDuration = data[4] & 0xFF;
-			String username = new String(data, 5, data.length - 5);
-
-			// Check values
-
-			// Generate token
-			String token = generateToken(TOKEN_SIZE);
-			
-			// Send game information to client
-			socket.send(Protocol.createGameServedPacket(
-				token.getBytes(),
-				open, maxPlayers,
-				rounds,
-				turnDuration));
-			
-			// Create new game
-			Game game = new Game(open, maxPlayers, rounds, turnDuration);
-			game.addPlayer(socket, username.toString());
-			games.put(token, game);
-		} else if (cmd == Protocol.JOIN_RND) {
-			String username = new String(data, 1, data.length - 1);
-			
-			for (String token : games.keySet()) {
-				Game game = games.get(token);
-
-				if (game.isPublic() && game.canJoin()) {
-					socket.send(Protocol.createGameServedPacket( // method for sending packet and adding to game
-						token.getBytes(),
-						game.isPublic(),
-						game.getMaxPlayers(),
-						game.getRounds(),
-						game.getTurnDuration()));
-
-					game.addPlayer(socket, username);
-					return;
-				}
-			}
-
-			socket.send(Protocol.createJoinErrorPacket("No games available".getBytes()));
-		} else if (cmd == Protocol.START) {
-			Game game = getGame(socket);
-
-			if (game != null) {
-				game.start(socket);
-			}
-		} else if (cmd == Protocol.DRAW_BUFFER || cmd == Protocol.MOUSE_UP || cmd == Protocol.SET_COLOR || cmd == Protocol.SET_WIDTH) {
-			Game game = getGame(socket);
-
-			if (game != null) { // Check source
-				game.broadcast(data);
-			}
-		} else if (cmd == Protocol.MSG) {
-			Game game = getGame(socket);
-
-			if (game != null) {
-				game.messageFrom(socket, data);
-			}
+		} else {
+			game.processPacket(socket, data);
 		}
 	}
 
@@ -131,6 +57,84 @@ public class GamesHandler {
 				games.remove(token);
 			}
 		}
+	}
+
+	private static void createGame(WebSocket socket, byte[] data) {
+		boolean open = data[1] != 0;
+		int maxPlayers = data[2] & 0xFF;
+		int rounds = data[3] & 0xFF;
+		int turnDuration = data[4] & 0xFF;
+		String username = new String(data, 5, data.length - 5);
+
+		// Check values
+
+		// Generate token
+		String token = generateToken(TOKEN_SIZE);
+		
+		// Send game information to client
+		socket.send(Protocol.createGameServedPacket(
+			token.getBytes(),
+			open, maxPlayers,
+			rounds,
+			turnDuration));
+		
+		// Create new game
+		Game game = new Game(open, maxPlayers, rounds, turnDuration);
+		game.addPlayer(socket, username.toString());
+		games.put(token, game);
+	}
+
+	private static void joinGame(WebSocket socket, byte[] data) {
+		String token = new String(data, 1, TOKEN_SIZE);
+
+		if (!games.containsKey(token)) {
+			socket.send(Protocol.createJoinErrorPacket("Invalid Token".getBytes()));
+			return;
+		}
+
+		Game game = games.get(token);
+		String username = new String(data, TOKEN_SIZE + 1, data.length - TOKEN_SIZE - 1);
+		
+		if (username.isBlank() || username.isEmpty()) { // regex check
+			return;
+		}
+
+		if (game.contains(username)) {
+			socket.send(Protocol.createJoinErrorPacket("This username already is laready used in this game".getBytes()));
+			return;
+		}
+
+		socket.send(Protocol.createGameServedPacket(
+			token.getBytes(),
+			game.isPublic(),
+			game.getMaxPlayers(),
+			game.getRounds(),
+			game.getTurnDuration()));
+		
+		game.addPlayer(socket, username);
+	}
+
+	private static void joinRandom(WebSocket socket, byte[] data) {
+		String username = new String(data, 1, data.length - 1);
+			
+		Game game;
+		for (String randomToken : games.keySet()) {
+			game = games.get(randomToken);
+
+			if (game.isPublic() && game.canJoin()) {
+				socket.send(Protocol.createGameServedPacket(
+					randomToken.getBytes(),
+					game.isPublic(),
+					game.getMaxPlayers(),
+					game.getRounds(),
+					game.getTurnDuration()));
+
+				game.addPlayer(socket, username);
+				return;
+			}
+		}
+
+		socket.send(Protocol.createJoinErrorPacket("No games available".getBytes()));
 	}
 
 	private static Game getGame(WebSocket socket) {
@@ -151,6 +155,21 @@ public class GamesHandler {
 		} while (games.containsKey(result.toString()));
 
 		return result;
+	}
+
+	public static void removeSocket(WebSocket socket) {
+		Game game = getGame(socket);
+
+		if (game != null) {
+			game.removePlayer(socket);
+		}
+	}
+
+	protected static void log() {
+		for (String token : games.keySet()) {
+			System.out.println(token + "\t" + games.get(token).size() + " players");
+		}
+		System.out.println("-------------------------------");
 	}
 
 }

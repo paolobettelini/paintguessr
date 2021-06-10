@@ -17,7 +17,9 @@ const ADD_SCORE		= 31;	// amount, username
 
 const JOIN_ERROR	= 201;	// reason
 
-const server = new WebSocket('ws://127.0.0.1:3333');
+//const server = new WebSocket('ws://83.79.53.229:4242');
+const server = new WebSocket('ws://localhost:3333');
+
 server.binaryType = "arraybuffer";
   
 server.onopen = function(e) {
@@ -42,7 +44,7 @@ server.onmessage = function(e) {
 		console.log("rounds: " + rounds);
 		console.log("turnDuration: " + turnDuration);
 
-		document.getElementById('token').innerHTML = "Token: " + token;
+		document.getElementById('token').innerHTML = "Token: [" + token + "]";
 
 		if (creator) {
 			document.getElementById('startButton').style.display = 'block';

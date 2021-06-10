@@ -37,6 +37,27 @@ public class Game {
 		this.currentTurn = 0;
 	}
 
+	public void processPacket(WebSocket socket, byte[] data) {
+		int cmd = data[0] & 0xFF;
+
+		switch (cmd) {
+			case Protocol.SET_WIDTH:
+			case Protocol.MOUSE_UP:
+			case Protocol.DRAW_BUFFER:
+			case Protocol.SET_COLOR:
+				if (drawing != null && drawing == socket) {
+					broadcastDrawingPacket(data);
+				}
+				break;
+			case Protocol.START:
+				start(socket);
+				break;
+			case Protocol.MSG:
+				messageFrom(socket, data);
+				break;
+		}
+	}
+
 	public void addPlayer(WebSocket socket, String username) {
 		// Send all previous player names
 		for (Player player : players.values()) {
@@ -51,6 +72,8 @@ public class Game {
 
 		// Notify everyone
 		broadcast(Protocol.createPlayerJoinedPacket(username.getBytes()));
+
+		GamesHandler.log();
 
 		if (players.size() == maxPlayers) {
 			start();
@@ -68,6 +91,9 @@ public class Game {
 			broadcast(Protocol.createAddScorePacket(amount, sender.getUsername().getBytes()));
 			
 			sender.hasWonTurn(true);
+
+			// check if everyone won
+
 			return;
 		}
 
@@ -96,7 +122,7 @@ public class Game {
 			currentTurn = 1;
 
 			if (++currentRound > rounds) {
-				GamesHandler.delete(this);
+				gameEnded();
 				return;
 			}
 
@@ -169,6 +195,12 @@ public class Game {
 
 	public void removePlayer(WebSocket socket) {
 		players.remove(socket);
+
+		GamesHandler.log();
+
+		if (players.size() < 2) {
+			gameEnded();
+		}
 	}
 
 	public boolean isPublic() {
@@ -185,6 +217,14 @@ public class Game {
 		}
 	}
 
+	public void broadcastDrawingPacket(byte[] data) {
+		for (WebSocket socket : players.keySet()) {
+			if (socket != drawing) {
+				socket.send(data);
+			}
+		}
+	}
+
 	public boolean contains(String username) {
 		for (Player player : players.values()) {
 			if (player.getUsername().equals(username)) {
@@ -195,19 +235,24 @@ public class Game {
 		return false;
 	}
 
+	private void gameEnded() {
+		GamesHandler.delete(this);
+		GamesHandler.log();
+	}
+
 	public void release() {
 		if (currentSchedulerTask != null) {
 			currentSchedulerTask.cancel();
 		}
 	}
 
-    public int getRounds() {
-        return rounds;
-    }
+	public int getRounds() {
+		return rounds;
+	}
 
-    public int getTurnDuration() {
-        return turnDuration;
-    }
+	public int getTurnDuration() {
+		return turnDuration;
+	}
 
 	public int getMaxPlayers() {
 		return maxPlayers;

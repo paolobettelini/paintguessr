@@ -47,9 +47,9 @@
 	<div id="home">
 		<button id="create-game" onclick="showCreateSection()">Create Game</button> <br><br>
 		<button id="join-random" onclick="joinRandom()">Join Random</button> <br><br>
-		<input id="token" placeholder="Token" type="text"> <br> <br>
+		<input id="tokenInput" placeholder="Token" type="text"> <br> <br>
 		<input id="homeSectionUsername" type="text" placeholder="Username" oninput="setUsername(this.value)">
-		<button id="join-game" onclick="joinGame(document.getElementById('token').value)">Join Game</button>
+		<button id="join-game" onclick="joinGame(document.getElementById('tokenInput').value)">Join Game</button>
 	</div>
 
 	<hr>
