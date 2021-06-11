@@ -62,14 +62,16 @@
 		<div id="leaderboard"></div>
 		<input type="color" onchange="setColor(this.value)">
 		<input type="range" onchange="setWidth(this.value)">
-		<canvas id="canvas" width="500px" height="500px"></canvas>
 		
 		<div id="chat">
 			<textarea style="resize: none;" id="textarea" cols="30" rows="10" disabled></textarea>
 			<br>
 			<input id="textinput" type="text">
+			<br>
 			<button onclick="sendMessage()">send</button>
 		</div>
+		
+		<canvas id="canvas" width="500px" height="500px"></canvas>
 	</div>
 
 	<br><br><br><br><br>

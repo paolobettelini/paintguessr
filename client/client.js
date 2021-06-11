@@ -17,8 +17,8 @@ const ADD_SCORE		= 31;	// amount, username
 
 const JOIN_ERROR	= 201;	// reason
 
-//const server = new WebSocket('ws://83.79.53.229:4242');
-const server = new WebSocket('ws://localhost:3333');
+const server = new WebSocket('ws://83.79.53.229:4242');
+//const server = new WebSocket('ws://localhost:3333');
 
 server.binaryType = "arraybuffer";
   
