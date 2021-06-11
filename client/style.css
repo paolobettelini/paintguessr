@@ -158,47 +158,154 @@ input[type="text"]:focus{
 		font-style: regular;
 		font-size: 20px;
 		border-style: none;
+		border-radius: 7px;
 		background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
 		transform: translate(-50%, 0%);
-		left: 70%;
+		left: 50%;
 		opacity: 70%;
 }
 #create-btn:hover{
-		animation: myAnim 200ms forwards;
+		animation: btnsAnim 200ms forwards;
 }
-@keyframes myAnim{
+@keyframes btnsAnim{
 		0%{ background: #04AA6D; }
-		100%{ 
-				background: #076d47;;
-				opacity: 100%;
-		}
+		100%{ background: #076d47; opacity: 100%; }
 }
 
 
 #home {
 		display: block;
-		background: grey;
+		background: white;
 		position: relative;
 		width: 20%;
 		transform: translate(-50%,0%);
 		left: 50%;
 }
 
+#home-btns{
+	position: relative;
+	display: flex;
+	align-items: center;
+	transform: translate(-50%,0%);
+	left: 50%;
+	width: 87%;
+	background: white;
+}
+
+#home button{
+		position: relative;
+		width: 140px;
+		height: 50px;
+		padding: 10px;
+		margin: 5px;
+		color: #fff;
+		font-family: Roboto;
+		font-style: regular;
+		font-size: 20px;
+		border-style: none;
+		border-radius: 7px;
+		background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
+		opacity: 0.7;
+		/*transform: translate(-50%, 0%);
+		left: 50%;
+		opacity: 70%;*/
+}
+#home button:hover{
+	animation: btnsAnim 200ms forwards;
+}
+#join-game{
+	position: relative;
+	transform: translate(-50%,0%);
+	left: 50%;
+}
 
 
 #game {
-		/*display: none;*/
+	/*display: none;*/
+	background: white;
 }
 
-#gg{
-		width: 100px;
-		height: 100px;
+#game button{
+	position: relative;
+	width: 140px;
+	height: 50px;
+	padding: 10px;
+	margin: 5px;
+	color: #fff;
+	font-family: Roboto;
+	font-style: regular;
+	font-size: 20px;
+	border-style: none;
+	border-radius: 7px;
+	background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
+	opacity: 0.7;
+	/*transform: translate(-50%, 0%);
+	left: 50%;
+	opacity: 70%;*/
+}
+#game button:hover{
+animation: btnsAnim 200ms forwards;
+}
+
+#startButton{
+	position: relative;
+	left: 20px;
+}
+#leaderboard{
+	font-size: 18px;
+	font-family: Roboto;
+	margin-left: 20px;
+}
+
+#changeColor{
+	margin-left: 20px;
+	width: 50px;
+	height: 30px;
+	border: none;
+	background: white;
+}
+
+#rangeWidth{
+	width: 100px;
+}
+
+#canvas{
+	background: white;
+	border: 1px solid #dadada;
+	position: relative;
+	transform: translate(50%,0%);
+	left: 0px;
+	top: -240px;
 }
 
 #chat {
-		border: black;
+	border: black;
+	background: white;
+	width: 330px;
+	margin-left: 20px;
+}
+#chat textarea{
+	background: white;
+}
+
+#textinput{
+	position: relative;
+	/*transform: translate(-50%,0%);*/
+	margin-left: -100px;
+	width: 200px;
+}
+
+#chat #send-message{
+	width: 100px;
+	margin-left: 120px;
 }
 
 #startButton {
-		display: none;
+	display: none;
+}
+
+
+#gg{
+	width: 100px;
+	height: 100px;
 }

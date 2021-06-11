@@ -20,8 +20,8 @@ public class Words {
 			String[] array = uri.toString().split("!");
 			FileSystem fs = FileSystems.newFileSystem(URI.create(array[0]), env);
 			Path path = fs.getPath(array[1]);
-			fs.close();
 			List<String> list = Files.readAllLines(path);
+			fs.close();
 			words = list.toArray(new String[list.size()]);
 		} catch (Exception e) {
 			e.printStackTrace();

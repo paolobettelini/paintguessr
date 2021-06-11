@@ -42,15 +42,29 @@
 		<button id="create-btn" onclick="createGame()">Create</button>
 	</div>
 
+	<br><br>
+
 	<hr>
+
+	<br><br>
 	
 	<div id="home">
-		<button id="create-game" onclick="showCreateSection()">Create Game</button> <br><br>
-		<button id="join-random" onclick="joinRandom()">Join Random</button> <br><br>
+		<div id="home-btns">
+			<button id="create-game" onclick="showCreateSection()">Create Game</button> 
+			<button id="join-random" onclick="joinRandom()">Join Random</button>
+		</div>
+
+		<br><br>
+
 		<input id="tokenInput" placeholder="Token" type="text"> <br> <br>
 		<input id="homeSectionUsername" type="text" placeholder="Username" oninput="setUsername(this.value)">
+		<br><br><br>
 		<button id="join-game" onclick="joinGame(document.getElementById('tokenInput').value)">Join Game</button>
+
+		<br><br>
 	</div>
+
+	<br><br>
 
 	<hr>
 
@@ -58,23 +72,21 @@
 		<p id="token"></p>
 		<p id="status"></p>
 		<p id="word"></p>
-		<button id="startButton" onclick="start()">Start</button>
-		<div id="leaderboard"></div>
-		<input type="color" onchange="setColor(this.value)">
-		<input type="range" onchange="setWidth(this.value)">
-		
-		<div id="chat">
-			<textarea style="resize: none;" id="textarea" cols="30" rows="10" disabled></textarea>
-			<br>
-			<input id="textinput" type="text">
-			<br>
-			<button onclick="sendMessage()">send</button>
-		</div>
-		
-		<canvas id="canvas" width="500px" height="500px"></canvas>
-	</div>
+		<br><br>
+		<button id="startButton" onclick="start()">Start</button> <br><br>
+		<div id="leaderboard"></div> <br> <br>
+		<input type="color" id="changeColor" onchange="setColor(this.value)"> <br> <br>
+		<input type="range" id="rangeWidth" onchange="setWidth(this.value)"> <br> <br> <br>
 
-	<br><br><br><br><br>
+		<div id="chat">
+			<textarea style="resize: none;" id="textarea" cols="40" rows="10" disabled></textarea> <br> <br>
+			<input id="textinput" type="text">
+			<button id="send-message" onclick="sendMessage()">Send</button>
+		</div>
+
+		<canvas id="canvas" width="1000px" height="700px"></canvas>
+		
+	</div>
 	
 	<script src="info.js"></script>
 	<script src="selector.js"></script>
