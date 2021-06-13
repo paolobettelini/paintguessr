@@ -98,8 +98,7 @@ public class Game {
 			sender.hasWonTurn(true);
 
 			if (isTurnComplete()) {
-				release();
-				nextTurn();
+				forceNextTurn();
 			}
 
 			return;
@@ -128,6 +127,11 @@ public class Game {
 		if (from == admin && players.size() > 1 && !hasStarted()) {
 			start();
 		}
+	}
+
+	private void forceNextTurn() {
+		release();
+		nextTurn();
 	}
 
 	private void start() {
@@ -217,10 +221,13 @@ public class Game {
 	public void removePlayer(WebSocket socket) {
 		byte[] username = players.get(socket).getUsername().getBytes();
 		players.remove(socket);
-		broadcast(Protocol.createPlayerLeftPacket(username));
+		boolean wasDrawing = socket == drawing;
+		broadcast(Protocol.createPlayerLeftPacket(username, wasDrawing));
 
 		if (players.size() < 2) {
 			GameOver();
+		} else if (wasDrawing) {
+			forceNextTurn();
 		}
 	}
 

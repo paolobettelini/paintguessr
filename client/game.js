@@ -15,6 +15,7 @@ var playersWhoWonTheTurn = [];
 var timerTask;
 var secondsLeft = 0;
 var currentTurn = 0;
+var currentRound = 0;
 var creator = false;
 var players = 0;
 

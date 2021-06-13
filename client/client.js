@@ -4,7 +4,7 @@ const CREATE_GAME	= 2;	// public, rounds, turn_duration, max_players, username
 const JOIN_RND		= 3		// username
 const START			= 4;	// -
 const PLAYER_JOIN	= 5;	// username
-const PLAYER_LEFT	= 6;	// username
+const PLAYER_LEFT	= 6;	// wasDrawing, username
 const NEXT_TURN		= 7;	// drawing, word
 const GAME_OVER		= 8;	// -
 
@@ -89,6 +89,12 @@ server.onmessage = function(e) {
 		dot.setAttribute('r', data[1] / 2);
 	} else if (cmd == NEXT_TURN) {
 		++currentTurn;
+		if (currentTurn == players + 1) {
+			currentTurn = 1;
+		}
+		if (currentTurn == 1) {
+			++currentRound;
+		}
 		drawing = data[1] != 0;
 		var word = "";
 		for (var i = 0; i < data.length - 2; i++) {
@@ -112,7 +118,8 @@ server.onmessage = function(e) {
 		displayLeaderboard();
 
 		document.getElementById('word').innerHTML = "Word: " + word;
-		setStatus("Playing... " + (currentTurn / maxPlayers | 0));
+		
+		setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
 		
 		if (currentTurn == 1) {
 			startButton.style.display = 'none';
@@ -144,11 +151,19 @@ server.onmessage = function(e) {
 		}
 	} else if (cmd == PLAYER_LEFT) {
 		var name = "";
-		for (var i = 0; i < data.length - 1; i++) {
-			name += String.fromCharCode(data[i + 1]);
+		for (var i = 0; i < data.length - 2; i++) {
+			name += String.fromCharCode(data[i + 2]);
 		}
 		displayMessage(name + ' left the game', '#FA8072');
 		--players;
+		if (data[1] != 0) { // if the drawing player left
+			--currentTurn;
+			if (currentTurn == 0) {
+				--currentRound;
+			}
+		} else {
+			setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
+		}
 	} else if (cmd == GAME_OVER) {
 		gameOver();
 	}

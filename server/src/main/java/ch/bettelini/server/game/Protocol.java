@@ -18,7 +18,7 @@ public class Protocol {
 	public static final int JOIN_RND		= 3;	// username
 	public static final int START			= 4;	// -
 	public static final int PLAYER_JOIN		= 5;	// username
-	public static final int PLAYER_LEFT		= 6;	// username
+	public static final int PLAYER_LEFT		= 6;	// wasDrawing, username
 	public static final int NEXT_TURN		= 7;	// drawing, word
 	// the client could know wheter the game has ended
 	// but it is much easier with a single broadcasted packet
@@ -85,8 +85,17 @@ public class Protocol {
 		return createPacket((byte) PLAYER_JOIN, username);
 	}
 
-	public static byte[] createPlayerLeftPacket(byte[] username) {
-		return createPacket((byte) PLAYER_LEFT, username);
+	public static byte[] createPlayerLeftPacket(byte[] username, boolean drawing) {
+		byte[] packet = new byte[2 + username.length];
+
+		packet[0] = (byte) PLAYER_LEFT;
+		packet[1] = (byte) (drawing ? ~0 : 0);
+
+		for (int i = 0; i < username.length; i++) {
+			packet[i + 2] = username[i];
+		}
+
+		return packet;
 	}
 
 	public static byte[] createGameServedPacket(byte[] token, boolean open, int maxPlayers, int rounds, int turnDuration) {
