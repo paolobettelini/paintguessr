@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="./style.css">
+	
+	<title>Client</title>
+</head>
+<body>
+	<header>
+		<h1 id="title">Paint Guessr</h1>
+	</header>
+
+	<br>
+	
+	<div id="create">
+		<h1 class="title">Create Game</h1>
+		<br>
+		<span id="maxPlayersDisplay">Max Players (5)</span> <br>
+		<input type="range" value="5" min="2" max="15" step="1" oninput="setMaxPlayers(this.value)"> <br>
+		<span id="roundsDisplay">Rounds (3)</span> <br>
+		<input type="range" value="3" min="1" max="15" step="1" oninput="setRounds(this.value)"> <br>
+		<span id="turnDurationDisplay">Turn Duration (30s)</span> <br>
+		<input type="range" value="30" min="15" max="180" step="1" oninput="setTurnDuration(this.value)"> <br> <br>
+		
+		<article class="centered">
+			<div class="wrapper">
+				<input type="radio" name="select" id="option-1" onchange="updateVisibility()" checked>
+				<input type="radio" name="select" id="option-2" onchange="updateVisibility()">
+				<label for="option-1" class="option option-1">
+					<div class="dot"></div>
+					<span>Public</span>
+				</label>
+				<label for="option-2" class="option option-2">
+					<div class="dot"></div>
+					<span>Private</span>
+				</label>
+			</div>
+		</article>
+		<input id="createSectionUsername" type="text" placeholder="Username" oninput="setUsername(this.value)">
+		<br>
+		<br>
+		<br>
+		<br>
+		<button id="create-btn" onclick="createGame()">Create</button>
+	</div>
+
+	<!--<hr>-->
+
+	<div id="home">
+		<h1 class="title">Home</h1>
+		<br>
+		<div class="centered" id="home-btns">
+			<button id="create-game" onclick="showCreateSection()">Create Game</button> 
+			<button id="join-random" onclick="joinRandom()">Join Random</button>
+		</div>
+
+		<br><br>
+
+		<article class="centered">
+			<input id="tokenInput" placeholder="Token" type="text"> <br> <br>
+			<input id="homeSectionUsername" type="text" placeholder="Username" oninput="setUsername(this.value)">
+		</article>
+
+		<br><br><br>
+		<button id="join-game" onclick="joinGame(document.getElementById('tokenInput').value)">Join Game</button>
+
+		<br><br>
+	</div>
+
+	<!--<hr>-->
+
+	<div id="game">
+		<h1 class="title">Playing</h1>
+		<br>
+
+		<div class="centered">
+			<button id="startButton" onclick="start()">Start</button>
+		</div>
+		
+		<table style="width: 100%;text-align: center;">
+			<tr>
+				<td>
+					<p id="token">Token: 5s9LO</p>
+					<br>
+					<p id="status">Waiting...</p>
+				</td>
+				<td>
+					<p id="word">Word: _______</p>
+					<br>
+					<p id="timeLeft">Time left: 30s</p>
+				</td>
+				<td>
+					<input type="color" id="changeColor" onchange="setColor(this.value)">
+					<br>
+					<div>
+						<input type="range" id="rangeWidth" min="1" max="20" value="5" oninput="updateDot(this.value)" onchange="setWidth(this.value)">
+						<svg height="20" width="20" style="margin-bottom: 5px;">
+							<circle id="circle" cx="10" cy="10" r="2.5" fill="#bbb"/>
+							Sorry, your browser does not support inline SVG.  
+						</svg> 
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="vertical-align: top;">
+					<br>
+					<div id="chat">
+						<div id="textarea"></div>
+						<br>
+						<br>
+						<div>
+							<input id="textInput" placeholder="Type your guess" type="text">
+							<button id="send-message" onclick="sendMessage()">Send</button>
+						</div>
+					</div>
+					<br>
+					<br>
+					<div class="centered">
+						<table id="leaderboard">
+						</table>
+					</div>
+				</td>
+				<td colspan="2">
+					<br>
+					<div class="centered">
+						<canvas id="canvas" width="1000px" height="700px"></canvas>
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		<br>
+
+	</div>
+	
+	<script src="info.js"></script>
+	<script src="selector.js"></script>
+	<script src="client.js"></script>
+	<script src="game.js"></script>
+</body>
+</html>

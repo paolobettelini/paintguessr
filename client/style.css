@@ -1,185 +1,208 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
 
-*{
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-header{
-		width: 100%;
-		height: 70px;
-		background: #04AA6D;
+header {
+	width: 100%;
+	height: 70px;
+	background: #04AA6D;
 }
 
-#title{
-		font-family: Roboto;
-		color: #fff;
-		text-align: center;
-		vertical-align: middle;
-		line-height: 70px;
+#title {
+	font-family: Roboto;
+	color: #fff;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 70px;
 }
 
 #create {
-		/*display: none;*/
-		position: relative;
-		width: 20%;
-		transform: translate(-50%,0%);
-		left: 50%;
+	/*display: none;*/
+	position: relative;
+	width: 20%;
+	transform: translate(-50%,0%);
+	left: 50%;
 }
 
-#create h1{ font-family: Roboto; font-style: bold; margin: 20px; text-align: center;}
-#create span{ font-family: Roboto; font-style: thin; margin: 20px;}
+.title {
+	font-family: Roboto;
+	font-style: bold;
+	margin: 20px;
+	text-align: center;
+}
 
-input[type="range"]{
-		margin: 10px 0 10px 20px;
-		-webkit-appearance: none;
-		width: 100%;
-		height: 10px;
-		background: #d3d3d3;
-		border-radius: 10px;
-		outline: none;
-		opacity: 0.7;
-		-webkit-transition: .2s;
-		transition: opacity .2s;
+#create span{
+	font-family: Roboto;
+	margin: 20px;
 }
-input[type="range"]:hover{
-		opacity: 1;
+
+input[type="range"] {
+	margin: 10px 0 10px 20px;
+	-webkit-appearance: none;
+	width: 100%;
+	height: 10px;
+	background: #d3d3d3;
+	border-radius: 10px;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
 }
-input[type="range"]::-webkit-slider-thumb{
-		-webkit-appearance: none;
-		appearance: none;
-		width: 20px;
-		height: 20px;
-		background: #04AA6D;
-		cursor: pointer;
-		border-radius: 10px;
+
+input[type="range"]:hover {
+	opacity: 1;
 }
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: #04AA6D;
+	cursor: pointer;
+	border-radius: 10px;
+}
+
 input[type="range"]::-moz-range-thumb {
-		width: 25px;
-		height: 25px;
-		background: #04AA6D;
-		cursor: pointer;
+	width: 25px;
+	height: 25px;
+	background: #04AA6D;
+	cursor: pointer;
 }
 
-/* RADIO BUTTON STYLE **** */
-.wrapper{
-		display: inline-flex;
-		background: #fff;
-		height: 100px;
-		width: 400px;
-		align-items: center;
-		justify-content: space-evenly;
-		border-radius: 5px;
-		padding: 0px 10px;
-	}
-	.wrapper .option{
-		background: #fff;
-		height: 50%;
-		width: 70%;
-		display: flex;
-		align-items: center;
-		justify-content: space-evenly;
-		margin: 0 10px;
-		border-radius: 5px;
-		cursor: pointer;
-		padding: 0 10px;
-		border: 2px solid lightgrey;
-	}
-	.wrapper .option .dot{
-		height: 10px;
-		width: 10px;
-		background: #d9d9d9;
-		border-radius: 50%;
-		position: relative;
-	}
-	.wrapper .option .dot::before{
-		position: absolute;
-		content: "";
-		top: 1px;
-		left: 1px;
-		width: 0px;
-		height: 0px;
-		background: #0a8f5e;
-		border-radius: 50%;
-		opacity: 0;
-		transform: scale(1.5);
-	}
-	input[type="radio"]{
-		display: none;
-	}
-	#option-1:checked:checked ~ .option-1,
-	#option-2:checked:checked ~ .option-2{
-		border-color: #04AA6D;
-		background: #04AA6D;
-	}
-	#option-1:checked:checked ~ .option-1 .dot,
-	#option-2:checked:checked ~ .option-2 .dot{
-		background: #fff;
-	}
-	#option-1:checked:checked ~ .option-1 .dot::before,
-	#option-2:checked:checked ~ .option-2 .dot::before{
-		opacity: 1;
-		transform: scale(1);
-	}
-	.wrapper .option span{
-		font-size: 20px;
-		color: #808080;
-	}
-	#option-1:checked:checked ~ .option-1 span,
-	#option-2:checked:checked ~ .option-2 span{
-		color: #fff;
-	}
-
-
-/* INPUT TEXTS */
-input[type="text"]{
-		font-family: Roboto;
-		font-style: thin;
-		font-size: 20px;
-		padding: 10px;
-		border-style: none;
-		border-bottom: 1px solid #04AA6D;
-		width: 200px;
-		height: 40px;
-		transform: translate(50%,0%);
-		left: 50%M
-}
-input[type="text"]:focus{
-		outline: none;
+.centered {
+	width:100%;
+	display: flex;
+	justify-content: center;
 }
 
-#create-btn{
-		position: relative;
-		width: 120px;
-		height: 40px;
-		color: #fff;
-		font-family: Roboto;
-		font-style: regular;
-		font-size: 20px;
-		border-style: none;
-		border-radius: 7px;
-		background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
-		transform: translate(-50%, 0%);
-		left: 50%;
-		opacity: 70%;
+.wrapper {
+	display: inline-flex;
+	background: #fff;
+	height: 100px;
+	width: 400px;
+	align-items: center;
+	justify-content: space-evenly;
+	border-radius: 5px;
+	padding: 0px 10px;
+}
+
+.wrapper .option {
+	background: #fff;
+	height: 50%;
+	width: 70%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+	margin: 0 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	padding: 0 10px;
+	border: 2px solid lightgrey;
+}
+
+.wrapper .option .dot {
+	height: 10px;
+	width: 10px;
+	background: #d9d9d9;
+	border-radius: 50%;
+	position: relative;
+}
+
+.wrapper .option .dot::before {
+	position: absolute;
+	content: "";
+	top: 1px;
+	left: 1px;
+	width: 0px;
+	height: 0px;
+	background: #0a8f5e;
+	border-radius: 50%;
+	opacity: 0;
+	transform: scale(1.5);
+}
+
+input[type="radio"] {
+	display: none;
+}
+
+#option-1:checked:checked ~ .option-1,
+#option-2:checked:checked ~ .option-2 {
+	border-color: #04AA6D;
+	background: #04AA6D;
+}
+
+#option-1:checked:checked ~ .option-1 .dot,
+#option-2:checked:checked ~ .option-2 .dot {
+	background: #fff;
+}
+
+#option-1:checked:checked ~ .option-1 .dot::before,
+#option-2:checked:checked ~ .option-2 .dot::before {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.wrapper .option span {
+	font-size: 20px;
+	color: #808080;
+}
+
+#option-1:checked:checked ~ .option-1 span,
+#option-2:checked:checked ~ .option-2 span {
+	color: #fff;
+}
+
+input[type="text"] {
+	font-family: Roboto;
+	text-align: center;
+	font-size: 20px;
+	padding: 10px;
+	border-style: none;
+	border-bottom: 1px solid #04AA6D;
+	width: 100%;
+	height: 40px;
+}
+
+input[type="text"]:focus {
+	outline: none;
+}
+
+#create-btn {
+	position: relative;
+	width: 120px;
+	height: 40px;
+	color: #fff;
+	font-family: Roboto;
+	font-style: regular;
+	font-size: 20px;
+	border-style: none;
+	border-radius: 7px;
+	background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
+	transform: translate(-50%, 0%);
+	left: 50%;
+	opacity: 70%;
 }
 #create-btn:hover{
-		animation: btnsAnim 200ms forwards;
+	animation: btnsAnim 200ms forwards;
 }
 @keyframes btnsAnim{
-		0%{ background: #04AA6D; }
-		100%{ background: #076d47; opacity: 100%; }
+	0%{ background: #04AA6D; }
+	100%{ background: #076d47; opacity: 100%; }
 }
 
 
 #home {
-		display: block;
-		background: white;
-		position: relative;
-		width: 20%;
-		transform: translate(-50%,0%);
-		left: 50%;
+	display: block;
+	background: white;
+	position: relative;
+	width: 20%;
+	transform: translate(-50%,0%);
+	left: 50%;
 }
 
 #home-btns{
@@ -192,40 +215,7 @@ input[type="text"]:focus{
 	background: white;
 }
 
-#home button{
-		position: relative;
-		width: 140px;
-		height: 50px;
-		padding: 10px;
-		margin: 5px;
-		color: #fff;
-		font-family: Roboto;
-		font-style: regular;
-		font-size: 20px;
-		border-style: none;
-		border-radius: 7px;
-		background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
-		opacity: 0.7;
-		/*transform: translate(-50%, 0%);
-		left: 50%;
-		opacity: 70%;*/
-}
-#home button:hover{
-	animation: btnsAnim 200ms forwards;
-}
-#join-game{
-	position: relative;
-	transform: translate(-50%,0%);
-	left: 50%;
-}
-
-
-#game {
-	/*display: none;*/
-	background: white;
-}
-
-#game button{
+#home button {
 	position: relative;
 	width: 140px;
 	height: 50px;
@@ -243,21 +233,55 @@ input[type="text"]:focus{
 	left: 50%;
 	opacity: 70%;*/
 }
-#game button:hover{
-animation: btnsAnim 200ms forwards;
+
+#home button:hover {
+	animation: btnsAnim 200ms forwards;
 }
 
-#startButton{
+#join-game {
+	position: relative;
+	transform: translate(-50%,0%);
+	left: 50%;
+}
+
+#game {
+	/*display: none;*/
+	background: white;
+}
+
+#game button {
+	position: relative;
+	width: 140px;
+	height: 50px;
+	padding: 10px;
+	margin: 5px;
+	color: #fff;
+	font-family: Roboto;
+	font-style: regular;
+	font-size: 20px;
+	border-style: none;
+	border-radius: 7px;
+	background: #04AA6D;
+	opacity: 0.7;
+	/*linear-gradient(to right bottom, #009FFF, #ec2F4B)*/
+}
+
+#game button:hover {
+	animation: btnsAnim 200ms forwards;
+}
+
+#startButton {
 	position: relative;
 	left: 20px;
 }
-#leaderboard{
+
+#leaderboard {
 	font-size: 18px;
 	font-family: Roboto;
 	margin-left: 20px;
 }
 
-#changeColor{
+#changeColor {
 	margin-left: 20px;
 	width: 50px;
 	height: 30px;
@@ -265,47 +289,73 @@ animation: btnsAnim 200ms forwards;
 	background: white;
 }
 
-#rangeWidth{
+#rangeWidth {
 	width: 100px;
 }
 
-#canvas{
+#canvas {
 	background: white;
-	border: 1px solid #dadada;
-	position: relative;
-	transform: translate(50%,0%);
-	left: 0px;
-	top: -240px;
+	border: 2px solid #dadada;
 }
 
 #chat {
 	border: black;
 	background: white;
 	width: 330px;
-	margin-left: 20px;
-}
-#chat textarea{
-	background: white;
+	margin: auto;
 }
 
-#textinput{
-	position: relative;
-	/*transform: translate(-50%,0%);*/
-	margin-left: -100px;
+#textInput {
+	/*position: relative;*/
+	/*margin-left: -100px;*/
 	width: 200px;
 }
 
-#chat #send-message{
+#chat #send-message {
 	width: 100px;
-	margin-left: 120px;
 }
 
 #startButton {
-	display: none;
+	/*display: none;*/
 }
 
+/*table tr:nth-child(odd) td:nth-child(even) {
+	background: red
+}
 
-#gg{
-	width: 100px;
-	height: 100px;
+table tr:nth-child(even) td:nth-child(even) {
+	background: green
+}
+
+table tr:nth-child(even) td:nth-child(odd) {
+	background: red
+}
+
+table tr:nth-child(odd) td:nth-child(odd) {
+	background: green
+}*/
+
+#leaderboard {
+	text-align: left;
+}
+
+#leaderboard td {
+	padding: 10px;
+}
+
+#leaderboard, #leaderboard td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+.lightgreen {
+	background-color: lightgreen;
+}
+
+#textarea {
+	width: 350px;
+	height: 500px;
+	overflow: auto;
+	border: 1px solid black;
+	text-align: left;
 }

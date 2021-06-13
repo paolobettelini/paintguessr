@@ -6,6 +6,7 @@ const START			= 4;	// -
 const PLAYER_JOIN	= 5;	// username
 const PLAYER_LEFT	= 6;	// username
 const NEXT_TURN		= 7;	// drawing, word
+const GAME_ENDED	= 7;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
@@ -17,11 +18,11 @@ const ADD_SCORE		= 31;	// amount, username
 
 const JOIN_ERROR	= 201;	// reason
 
-const server = new WebSocket('ws://83.79.53.229:4242');
+const server = new WebSocket('ws://83.79.53.229:3333');
 //const server = new WebSocket('ws://localhost:3333');
-
+//const server = new WebSocket('ws://192.168.1.115:3333');
 server.binaryType = "arraybuffer";
-  
+
 server.onopen = function(e) {
 	console.log("Connection established");
 };
@@ -83,6 +84,8 @@ server.onmessage = function(e) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
 		ctx.lineWidth = data[1];
+		widthInput.value = data[1];
+		dot.setAttribute('r', data[1] / 2);
 	} else if (cmd == NEXT_TURN) {
 		++currentTurn;
 		drawing = data[1] != 0;
@@ -95,21 +98,26 @@ server.onmessage = function(e) {
 		ctx.fillStyle = "white";
 		ctx.fillRect(0, 0, width, height);
 
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = 5;
+
+		widthInput.value = 5;
+		dot.setAttribute('r', 5 / 2);
+
+		colorInput.disabled = !drawing;
+		widthInput.disabled = !drawing;
+
+		playersWhoWonTheTurn = [];
+		displayLeaderboard();
+
 		document.getElementById('word').innerHTML = "Word: " + word;
 		setStatus("Playing... " + (currentTurn / maxPlayers | 0));
-
-		mouseUp();
-
-		if (drawing) {
-			setTimeout(() => {
-				// enable features
-				drawing = true;
-				
-				setTimeout(() => {
-					drawing = false;
-				}, turnDuration * 1000);
-			}, 3000);
+		
+		if (currentTurn == 1) {
+			startButton.style.display = 'none';
 		}
+
+		nextTurn();
 	} else if (cmd == JOIN_ERROR) {
 		var msg = "";
 		for (var i = 0; i < data.length - 1; i++) {
@@ -124,8 +132,17 @@ server.onmessage = function(e) {
 			name += String.fromCharCode(data[i + 2]);
 		}
 
+		playersWhoWonTheTurn.push(name);
+
 		leaderboard[name] += amount;
-		displayLeaderboard();
+		console.log("players: " + players);
+		console.log("thatWon: " + playersWhoWonTheTurn.length);
+		if (players != playersWhoWonTheTurn.length + 1) { /// ???
+			displayLeaderboard();
+		}
+	} else if (cmd == PLAYER_LEFT) {
+		// player left the game
+		--players;
 	}
 };
 
@@ -199,14 +216,20 @@ function createGame() {
 	sendToServer(packet);
 }
 
-var textinput = document.getElementById('textinput');
+var textInput = document.getElementById('textInput');
+
+textInput.addEventListener('keydown', e => {
+	if (e.key == "Enter") {
+		sendMessage();
+	}
+})
 
 function sendMessage() {
-	var msg = textinput.value;
+	var msg = textInput.value;
 	if (msg == '') {
 		return;
 	}
-	textinput.value = '';
+	textInput.value = '';
 	var packet = new ArrayBuffer(1 + msg.length);
 	var view = new Uint8Array(packet);
 	view[0] = MSG;
@@ -226,7 +249,10 @@ function start() {
 }
 
 function displayMessage(msg) {
-	textarea.append(msg + '\n');
+	var el = document.createElement('p');
+	el.appendChild(document.createTextNode("PAOLO: MSG"));
+	textarea.appendChild(el)
+	textarea.scrollTop = textarea.scrollHeight;
 }
 
 function setStatus(status) {

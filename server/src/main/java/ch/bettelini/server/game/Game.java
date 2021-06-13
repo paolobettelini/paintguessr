@@ -1,6 +1,8 @@
 package ch.bettelini.server.game;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
@@ -23,6 +25,7 @@ public class Game {
 	private int currentTurn;
 	private long roundStartTime;
 	private String currentWord;
+	private List<String> lastWords;
 	private TimerTask currentSchedulerTask;
 
 	public Game(boolean open, int maxPlayers, int rounds, int turnDuration) {
@@ -31,6 +34,7 @@ public class Game {
 		this.rounds = rounds;
 		this.turnDuration = turnDuration;
 		
+		this.lastWords = new LinkedList<>();
 		this.currentSchedulerTask = null;
 		this.players = new HashMap<>();
 		this.currentRound = 0;
@@ -79,8 +83,6 @@ public class Game {
 		}
 
 		System.out.println(players.size());
-		
-		GamesHandler.log();
 	}
 
 	public void messageFrom(WebSocket socket, byte[] data) {
@@ -90,7 +92,7 @@ public class Game {
 		String msg = new String(data, 1, data.length - 1);
 
 		if (currentWord != null && !status && currentWord.equalsIgnoreCase(msg)) {
-			int amount = 100 - (int) (System.currentTimeMillis() - roundStartTime - 3000) / turnDuration / 10;
+			int amount = 100 - (int) (System.currentTimeMillis() - roundStartTime) / turnDuration / 10;
 			broadcast(Protocol.createAddScorePacket(amount, sender.getUsername().getBytes()));
 			
 			sender.hasWonTurn(true);
@@ -166,8 +168,11 @@ public class Game {
 		_drawing.hasWonTurn(true);
 		
 		// Choose word
-		//this.currentWord = Words.random();
 		this.currentWord = Words.random();
+		do {
+			this.currentWord = Words.random();
+		} while(lastWords.contains(this.currentWord));
+		lastWords.add(currentWord);
 
 		byte[] packet = Protocol.createNextTurnPacket(false, Words.obfuscate(currentWord).getBytes());
 		byte[] drawingPacket = Protocol.createNextTurnPacket(true, currentWord.getBytes());
@@ -189,7 +194,7 @@ public class Game {
 			
 		};
 
-		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1000 + 3000);
+		GamesHandler.scheduler.schedule(currentSchedulerTask, turnDuration * 1000);
 		roundStartTime = System.currentTimeMillis();
 	}
 
@@ -211,8 +216,6 @@ public class Game {
 
 	public void removePlayer(WebSocket socket) {
 		players.remove(socket);
-
-		GamesHandler.log();
 
 		if (players.size() < 2) {
 			gameEnded();
@@ -252,8 +255,8 @@ public class Game {
 	}
 
 	private void gameEnded() {
+		// send GAME:ENDED PACKET
 		GamesHandler.delete(this);
-		GamesHandler.log();
 	}
 
 	public void release() {
