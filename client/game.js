@@ -91,10 +91,17 @@ byteBuffer[0] = DRAW_BUFFER;
 canvas.onmousemove = e => {
 	var x = e.offsetX;
 	var y = e.offsetY;
-	if (drawing && dragging && y >= 0 && x >= 0) {
+	if (drawing && dragging && y >= 0 && x >= 0 && x < width && y < height) {
 		if (counter % BLOCK_SIZE == 0 && counter != 0) {
 			sendToServer(byteBuffer);
-			drawLineBuf(byteBuffer.slice(1, byteBuffer.length));
+		}
+
+		if (initLine) {
+			initLine = false;
+			ctx.moveTo(x, y);
+		} else {
+			ctx.lineTo(x, y);
+			ctx.stroke();
 		}
 		
 		var w = 65535 * (x / width) | 0;
@@ -111,6 +118,8 @@ canvas.onmousedown = e => {
 	dragging = true;
 	x = e.offsetX
 	y = e.offsetY
+
+	ctx.beginPath();
 }
 
 var x0 = -1, y0 = -1;
@@ -118,11 +127,8 @@ var initLine = true;
 
 canvas.onmouseup = e => {
 	if (drawing) {
-		console.log("counter: " + counter);
-		if (--counter % BLOCK_SIZE != 0) { // flush remaining buffer data
-			//var v = 1 + ((counter % BLOCK_SIZE) << 2);
-			//sendToServer(byteBuffer.slice(0, v))
-			//drawLineBuf(byteBuffer.slice(1, v))
+		if (counter != 0 && --counter % BLOCK_SIZE != 0) { // flush remaining buffer data
+			sendToServer(byteBuffer.slice(0, 1 + ((counter % BLOCK_SIZE) << 2)))
 		}
 		
 		mouseUp();
@@ -167,8 +173,7 @@ function drawLineBuf(buf) {
 	}
 	
 	ctx.moveTo(x0, y0);
-	
-	for (var i = 4; i < BLOCK_SIZE << 2; i += 4) {
+	for (var i = 4; i < buf.length; i += 4) {
 		var x1 = (buf[i] << 8 | buf[i + 1]) / 65535 * width;
 		var y1 = (buf[i + 2] << 8 | buf[i + 3]) / 65535 * height;
 		
