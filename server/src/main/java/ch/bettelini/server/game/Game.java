@@ -49,6 +49,7 @@ public class Game {
 			case Protocol.MOUSE_UP:
 			case Protocol.DRAW_BUFFER:
 			case Protocol.SET_COLOR:
+			case Protocol.UNDO:
 				if (drawing != null && drawing == socket) {
 					broadcastDrawingPacket(data);
 				}

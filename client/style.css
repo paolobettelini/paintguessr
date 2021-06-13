@@ -21,6 +21,7 @@ header {
 }
 
 #create {
+	display: none;
 	/*display: none;*/
 	position: relative;
 	width: 20%;
@@ -249,6 +250,7 @@ input[type="text"]:focus {
 }
 
 #game {
+	display: none;
 	/*display: none;*/
 	background: white;
 }
@@ -321,6 +323,7 @@ input[type="text"]:focus {
 
 #startButton {
 	/*display: none;*/
+	display: none;
 }
 
 /*table tr:nth-child(odd) td:nth-child(even) {

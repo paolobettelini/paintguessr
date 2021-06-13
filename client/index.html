@@ -83,23 +83,23 @@
 		<table style="width: 100%;text-align: center;">
 			<tr>
 				<td>
-					<span class="bold" id="token">Token: 5s9LO</span>
+					<span class="bold" id="token"></span>
 					<br>
 					<br>
-					<span class="bold" id="status">Waiting...</span>
+					<span class="bold" id="status"></span>
 				</td>
 				<td>
 					<span class="bold">Word: </span>
-					<span id="word" style="letter-spacing: 5px;">_______</span>
+					<span id="word" style="letter-spacing: 5px;"></span>
 					<br><br>
-					<span class="bold" id="timeLeft">Time left: 30s</span>
+					<span class="bold" id="timeLeft"></span>
 				</td>
 				<td>
 					<input type="color" id="changeColor" onchange="setColor(this.value)">
 					<br>
 					<br>
 					<div>
-						<input type="range" id="rangeWidth" min="1" max="20" value="5" oninput="updateDot(this.value)" onchange="setWidth(this.value)">
+						<input type="range" id="rangeWidth" min="1" max="20" value="5" oninput="updateDot(this.value)" onchange="setWidth(this.value, true)">
 						<svg height="20" width="20" style="margin-bottom: 5px;">
 							<circle id="circle" cx="10" cy="10" r="2.5" fill="#bbb"/>
 						</svg> 

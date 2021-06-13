@@ -12,6 +12,7 @@ const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
 const SET_COLOR		= 22;	// r, g, b
 const SET_WIDTH		= 23;	// line width
+const UNDO			= 24;	// -
 
 const MSG			= 30;	// spectator, message
 const ADD_SCORE		= 31;	// amount, username
@@ -73,6 +74,7 @@ server.onmessage = function(e) {
 		drawLineBuf(data.slice(1, data.length));
 	} else if (cmd == MOUSE_UP) {
 		mouseUp();
+		pushLine();
 	} else if (cmd == MSG) {
 		var spectator = data[1] != 0;
 		console.log(data.slice(2, data.length))
@@ -81,6 +83,7 @@ server.onmessage = function(e) {
 	} else if (cmd == SET_COLOR) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
+
 		ctx.lineWidth = data[1];
 		widthInput.value = data[1];
 		dot.setAttribute('r', data[1] / 2);
@@ -99,17 +102,17 @@ server.onmessage = function(e) {
 		}
 
 		// clear canvas
-		ctx.fillStyle = "white";
-		ctx.fillRect(0, 0, width, height);
+		clearCanvas();
 
 		ctx.strokeStyle = "#000000";
-		ctx.lineWidth = 5;
-
-		widthInput.value = 5;
-		dot.setAttribute('r', 5 / 2);
+		setWidth(5, false);
 
 		colorInput.disabled = !drawing;
 		widthInput.disabled = !drawing;
+
+		lineHistory = [];
+		currentLine = [];
+		historyPos = 0;
 
 		playersWhoWonTheTurn = [];
 		displayLeaderboard();
@@ -163,6 +166,8 @@ server.onmessage = function(e) {
 		}
 	} else if (cmd == GAME_OVER) {
 		gameOver();
+	} else if (cmd == UNDO) {
+		undo(false);
 	}
 };
 

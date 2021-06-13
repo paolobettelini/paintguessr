@@ -26,6 +26,7 @@ public class Protocol {
 	public static final int MOUSE_UP		= 21;	// -
 	public static final int SET_COLOR		= 22;	// r, g, b
 	public static final int SET_WIDTH		= 23;	// line width
+	public static final int UNDO			= 24;	// -
 
 	public static final int MSG				= 30;	// spectator, message
 	public static final int ADD_SCORE		= 31;	// amount, username

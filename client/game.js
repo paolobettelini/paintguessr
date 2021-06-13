@@ -8,6 +8,9 @@ var ctx = canvas.getContext('2d');
 var width = canvas.width;
 var height = canvas.height;
 
+var lineHistory = [];
+var currentLine = [];
+
 var dragging = false;
 var drawing = false;
 var leaderboard;
@@ -67,10 +70,12 @@ function updateDot(v) {
 	}
 }
 
-function setWidth(v) {
-	if (drawing) {
-		ctx.lineWidth = v;
-
+function setWidth(v, send) {
+	ctx.lineWidth = v;
+	widthInput.value = v;
+	dot.setAttribute('r', v / 2);
+	
+	if (drawing && send) {
 		var packet = new ArrayBuffer(2);
 		var view = new Uint8Array(packet);
 		view[0] = SET_WIDTH;
@@ -103,6 +108,11 @@ canvas.onmousemove = e => {
 			ctx.lineTo(x, y);
 			ctx.stroke();
 		}
+
+		currentLine.push({
+			x: x,
+			y: y
+		});
 		
 		var w = 65535 * (x / width) | 0;
 		var h = 65535 * (y / height) | 0;
@@ -118,12 +128,31 @@ canvas.onmousedown = e => {
 	dragging = true;
 	x = e.offsetX
 	y = e.offsetY
-
 	ctx.beginPath();
 }
 
 var x0 = -1, y0 = -1;
 var initLine = true;
+
+function undo(send) {
+	if (lineHistory.length != 0) {
+		var oldColor = lineHistory[lineHistory.length - 1].color;
+		var oldLineWidth = lineHistory[lineHistory.length - 1].thickness;
+		lineHistory.pop()
+
+		redraw();
+
+		ctx.fillStyle = oldColor;
+		ctx.lineWidth = oldLineWidth;
+	
+		if (drawing && send) {
+			var packet = new ArrayBuffer(1);
+			var view = new Uint8Array(packet);
+			view[0] = UNDO;
+			sendToServer(packet);
+		}
+	}
+}
 
 canvas.onmouseup = e => {
 	if (drawing) {
@@ -157,9 +186,27 @@ function nextTurn() {
 }
 
 function mouseUp() {
+	if (dragging) {
+		pushLine();
+	}
+
 	dragging = false;
 	initLine = true;
 	counter = 0;
+}
+
+function pushLine() {
+	lineHistory.push({
+		line: currentLine,
+		thickness: ctx.lineWidth,
+		color: ctx.strokeStyle
+	});
+	currentLine = [];
+}
+
+function clearCanvas() {
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, width, height);
 }
 
 function drawLineBuf(buf) {
@@ -170,8 +217,13 @@ function drawLineBuf(buf) {
 		
 		x0 = (buf[0] << 8 | buf[1]) / 65535 * width;
 		y0 = (buf[2] << 8 | buf[3]) / 65535 * height;
+
+		currentLine.push({
+			x: x0,
+			y: y0
+		});
 	}
-	
+
 	ctx.moveTo(x0, y0);
 	for (var i = 4; i < buf.length; i += 4) {
 		var x1 = (buf[i] << 8 | buf[i + 1]) / 65535 * width;
@@ -179,9 +231,36 @@ function drawLineBuf(buf) {
 		
 		ctx.lineTo(x1, y1);
 		
+		currentLine.push({
+			x: x1,
+			y: y1
+		});
+
 		x0 = x1;
 		y0 = y1;
 	}
 	
 	ctx.stroke();
+}
+
+function redraw() {
+	clearCanvas();
+
+	for (var i = 0; i < lineHistory.length; i++) {
+		ctx.beginPath()
+		
+		var line = lineHistory[i].line;
+		ctx.strokeStyle = lineHistory[i].color;
+		setWidth(lineHistory[i].thickness, false);
+
+		for (var j = 0; j < line.length; j++) {
+			var point = line[j];
+			if (j == 0) {
+				ctx.moveTo(point.x, point.y);
+			} else {
+				ctx.lineTo(point.x, point.y)
+			}
+		}
+		ctx.stroke();
+	}
 }

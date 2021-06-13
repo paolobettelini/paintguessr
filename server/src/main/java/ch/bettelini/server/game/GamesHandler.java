@@ -88,7 +88,6 @@ public class GamesHandler {
 		String token = new String(data, 1, TOKEN_SIZE);
 
 		if (!games.containsKey(token)) {
-			System.out.println("duplicated name");
 			socket.send(Protocol.createJoinErrorPacket("Invalid Token".getBytes()));
 			return;
 		}
