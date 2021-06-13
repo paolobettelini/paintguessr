@@ -23,6 +23,8 @@ const server = new WebSocket('ws://83.79.53.229:3333');
 //const server = new WebSocket('ws://192.168.1.115:3333');
 server.binaryType = "arraybuffer";
 
+var decoder = new TextDecoder();
+
 server.onopen = function(e) {
 	console.log("Connection established");
 };
@@ -41,9 +43,6 @@ server.onmessage = function(e) {
 		maxPlayers = data[5 + 2] & 0xFF
 		rounds = data[5 + 3] & 0xFF;
 		turnDuration = data[5 + 4] & 0xFF;
-		
-		console.log("rounds: " + rounds);
-		console.log("turnDuration: " + turnDuration);
 
 		document.getElementById('token').innerHTML = "Token: " + token + "";
 
@@ -75,12 +74,10 @@ server.onmessage = function(e) {
 	} else if (cmd == MOUSE_UP) {
 		mouseUp();
 	} else if (cmd == MSG) {
-		var msg = "";
 		var spectator = data[1] != 0;
-		for (var i = 0; i < data.length - 2; i++) {
-			msg += String.fromCharCode(data[i + 2]);
-		}
-		displayMessage(msg, undefined, spectator ? '#90EE90' : undefined);
+		console.log(data.slice(2, data.length))
+		var msg = decoder.decode(data.slice(2, data.length));
+		displayMessage(msg, undefined, spectator ? '#37b34e' : undefined);
 	} else if (cmd == SET_COLOR) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
@@ -117,7 +114,7 @@ server.onmessage = function(e) {
 		playersWhoWonTheTurn = [];
 		displayLeaderboard();
 
-		document.getElementById('word').innerHTML = "Word: " + word;
+		document.getElementById('word').innerHTML = word;
 		
 		setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
 		
@@ -183,7 +180,12 @@ function sendToServer(data) {
 
 function joinGame(token) {
 	if (username.length == 0) {
-		alert("Username cannot be empty")
+		alert('Username cannot be empty')
+		return;
+	}
+
+	if (!username.match(/^[a-zA-Z0-9._]{0,20}$/)) {
+		alert('Invalid username');
 		return;
 	}
 
@@ -203,7 +205,12 @@ function joinGame(token) {
 
 function joinRandom() {
 	if (username.length == 0) {
-		alert("Username cannot be empty")
+		alert('Username cannot be empty');
+		return;
+	}
+
+	if (!username.match(/^[a-zA-Z0-9._]{0,20}$/)) {
+		alert('Invalid username');
 		return;
 	}
 
@@ -220,7 +227,12 @@ function joinRandom() {
 
 function createGame() {
 	if (username == '') {
-		alert("Username cannot be empty")
+		alert('Username cannot be empty')
+		return;
+	}
+
+	if (!username.match(/^[a-zA-Z0-9._]{0,20}$/)) {
+		alert('Invalid username');
 		return;
 	}
 
@@ -253,9 +265,15 @@ function sendMessage() {
 		return;
 	}
 	textInput.value = '';
+	if (msg.length > 40) {
+		alert('Messages can be only 40 characters')
+		return;
+	}
+
 	var packet = new ArrayBuffer(1 + msg.length);
 	var view = new Uint8Array(packet);
 	view[0] = MSG;
+	//var encoded = new TextEncoder().encode(msg);
 	for (var i = 0; i < msg.length; i++) {
 		view[i + 1] = msg.charCodeAt(i);
 	}

@@ -20,8 +20,6 @@ public class Protocol {
 	public static final int PLAYER_JOIN		= 5;	// username
 	public static final int PLAYER_LEFT		= 6;	// wasDrawing, username
 	public static final int NEXT_TURN		= 7;	// drawing, word
-	// the client could know wheter the game has ended
-	// but it is much easier with a single broadcasted packet
 	public static final int GAME_OVER		= 8;	// -
 
 	public static final int DRAW_BUFFER		= 20;	// point...

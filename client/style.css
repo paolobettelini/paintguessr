@@ -363,3 +363,8 @@ table tr:nth-child(odd) td:nth-child(odd) {
 	border: 1px solid black;
 	text-align: left;
 }
+
+.bold {
+	font-size: large;
+	font-weight: bold;
+}
