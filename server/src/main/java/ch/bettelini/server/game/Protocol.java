@@ -20,19 +20,35 @@ public class Protocol {
 	public static final int PLAYER_JOIN		= 5;	// username
 	public static final int PLAYER_LEFT		= 6;	// username
 	public static final int NEXT_TURN		= 7;	// drawing, word
+	// the client could know wheter the game has ended
+	// but it is much easier with a single broadcasted packet
+	public static final int GAME_OVER		= 8;	// -
 
 	public static final int DRAW_BUFFER		= 20;	// point...
 	public static final int MOUSE_UP		= 21;	// -
 	public static final int SET_COLOR		= 22;	// r, g, b
 	public static final int SET_WIDTH		= 23;	// line width
 
-	public static final int MSG				= 30;	// message
+	public static final int MSG				= 30;	// spectator, message
 	public static final int ADD_SCORE		= 31;	// amount, username
 
 	public static final int JOIN_ERROR		= 201;	// reason
 
-	public static byte[] createMessagePacket(byte[] message) {
-		return createPacket((byte) MSG, message);
+	public static byte[] createGameOverPacket() {
+		return new byte[] {(byte) GAME_OVER};
+	}
+
+	public static byte[] createMessagePacket(byte[] message, boolean spectator) {
+		byte[] packet = new byte[2 + message.length];
+
+		packet[0] = (byte) MSG;
+		packet[1] = (byte) (spectator ? ~0 : 0);
+
+		for (int i = 0; i < message.length; i++) {
+			packet[i + 2] = message[i];
+		}
+
+		return packet;
 	}
 
 	public static byte[] createJoinErrorPacket(byte[] reason) {

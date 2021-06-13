@@ -6,14 +6,14 @@ const START			= 4;	// -
 const PLAYER_JOIN	= 5;	// username
 const PLAYER_LEFT	= 6;	// username
 const NEXT_TURN		= 7;	// drawing, word
-const GAME_ENDED	= 7;	// -
+const GAME_OVER		= 8;	// -
 
 const DRAW_BUFFER	= 20;	// point...
 const MOUSE_UP		= 21;	// -
 const SET_COLOR		= 22;	// r, g, b
 const SET_WIDTH		= 23;	// line width
 
-const MSG			= 30;	// Chat message
+const MSG			= 30;	// spectator, message
 const ADD_SCORE		= 31;	// amount, username
 
 const JOIN_ERROR	= 201;	// reason
@@ -76,10 +76,11 @@ server.onmessage = function(e) {
 		mouseUp();
 	} else if (cmd == MSG) {
 		var msg = "";
-		for (var i = 0; i < data.length - 1; i++) {
-			msg += String.fromCharCode(data[i + 1]);
+		var spectator = data[1] != 0;
+		for (var i = 0; i < data.length - 2; i++) {
+			msg += String.fromCharCode(data[i + 2]);
 		}
-		displayMessage(msg);
+		displayMessage(msg, undefined, spectator ? '#90EE90' : undefined);
 	} else if (cmd == SET_COLOR) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
@@ -134,20 +135,27 @@ server.onmessage = function(e) {
 
 		playersWhoWonTheTurn.push(name);
 
+		displayMessage(name + ' guessed the word', '#90EE90');
+
 		leaderboard[name] += amount;
-		console.log("players: " + players);
-		console.log("thatWon: " + playersWhoWonTheTurn.length);
-		if (players != playersWhoWonTheTurn.length + 1) { /// ???
+		
+		if (players != playersWhoWonTheTurn.length + 1) {
 			displayLeaderboard();
 		}
 	} else if (cmd == PLAYER_LEFT) {
-		// player left the game
+		var name = "";
+		for (var i = 0; i < data.length - 1; i++) {
+			name += String.fromCharCode(data[i + 1]);
+		}
+		displayMessage(name + ' left the game', '#FA8072');
 		--players;
+	} else if (cmd == GAME_OVER) {
+		gameOver();
 	}
 };
 
 server.onclose = function(e) {
-
+	//alert('Connection error');
 };
 
 server.onerror = function(e) {
@@ -248,9 +256,16 @@ function start() {
 	sendToServer(view);
 }
 
-function displayMessage(msg) {
+function displayMessage(msg, backColor, foreColor) {
 	var el = document.createElement('p');
-	el.appendChild(document.createTextNode("PAOLO: MSG"));
+	el.appendChild(document.createTextNode(msg));
+	if (backColor != undefined) {
+		el.style.backgroundColor = backColor;
+		el.style.fontWeight = 'bold';
+	}
+	if (foreColor != null) {
+		el.style.color = foreColor;
+	}
 	textarea.appendChild(el)
 	textarea.scrollTop = textarea.scrollHeight;
 }

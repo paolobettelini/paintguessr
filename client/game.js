@@ -22,6 +22,11 @@ ctx.lineCap = 'round';
 colorInput.disabled = true;
 widthInput.disabled = true;
 
+function gameOver() {
+	clearInterval(timerTask);
+	showGameOver(leaderboard);
+}
+
 function displayLeaderboard() {
 	var keys = keys = Object.keys(leaderboard);
 	keys = keys.sort((a, b) => leaderboard[a] > leaderboard[b] ? -1 : 1);
@@ -112,7 +117,8 @@ var initLine = true;
 
 canvas.onmouseup = e => {
 	if (drawing) {
-		if (counter % BLOCK_SIZE != 0) {// flush remaining data
+		console.log("counter: " + counter);
+		if (--counter % BLOCK_SIZE != 0) { // flush remaining buffer data
 			//var v = 1 + ((counter % BLOCK_SIZE) << 2);
 			//sendToServer(byteBuffer.slice(0, v))
 			//drawLineBuf(byteBuffer.slice(1, v))

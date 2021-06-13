@@ -244,6 +244,10 @@ input[type="text"]:focus {
 	left: 50%;
 }
 
+#gameOver {
+	display: none;
+}
+
 #game {
 	/*display: none;*/
 	background: white;
@@ -335,15 +339,15 @@ table tr:nth-child(odd) td:nth-child(odd) {
 	background: green
 }*/
 
-#leaderboard {
+#leaderboard, #gameOverLeaderboard {
 	text-align: left;
 }
 
-#leaderboard td {
+#gameOverLeaderboard td, #leaderboard td {
 	padding: 10px;
 }
 
-#leaderboard, #leaderboard td {
+#gameOverLeaderboard, #gameOverLeaderboard td, #leaderboard, #leaderboard td {
 	border: 1px solid black;
 	border-collapse: collapse;
 }

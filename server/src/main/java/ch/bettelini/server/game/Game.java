@@ -105,7 +105,7 @@ public class Game {
 			return;
 		}
 
-		byte[] packet = Protocol.createMessagePacket((sender.getUsername() + ": " + msg).getBytes());
+		byte[] packet = Protocol.createMessagePacket((sender.getUsername() + ": " + msg).getBytes(), sender.hasWonTurn());
 
 		for (WebSocket player : players.keySet()) {
 			if (!status || players.get(player).hasWonTurn()) {
@@ -140,7 +140,7 @@ public class Game {
 			currentTurn = 1;
 
 			if (++currentRound > rounds) {
-				gameEnded();
+				GameOver();
 				return;
 			}
 
@@ -215,10 +215,12 @@ public class Game {
 	}
 
 	public void removePlayer(WebSocket socket) {
+		byte[] username = players.get(socket).getUsername().getBytes();
 		players.remove(socket);
+		broadcast(Protocol.createPlayerLeftPacket(username));
 
 		if (players.size() < 2) {
-			gameEnded();
+			GameOver();
 		}
 	}
 
@@ -254,8 +256,9 @@ public class Game {
 		return false;
 	}
 
-	private void gameEnded() {
-		// send GAME:ENDED PACKET
+	private void GameOver() {
+		broadcast(Protocol.createGameOverPacket());
+
 		GamesHandler.delete(this);
 	}
 

@@ -12,8 +12,17 @@ import java.nio.ByteBuffer;
 public class Server extends WebSocketServer {
 
 	public static void main(String[] args) {
-		//new Server(new InetSocketAddress("192.168.1.104", 4242)).start();
-		new Server(new InetSocketAddress("192.168.1.115", 3333)).start();
+		if (args.length != 2) {
+			System.out.println("Parameters: <IPv4> <port> [ram]");
+			System.out.println("Example:");
+			System.out.println("java -jar server.jar 192.168.1.2 4242 -Xmx1024m");
+			return;
+		}
+		try {
+			new Server(new InetSocketAddress(args[0], Integer.parseInt(args[1]))).start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Server(InetSocketAddress address) {

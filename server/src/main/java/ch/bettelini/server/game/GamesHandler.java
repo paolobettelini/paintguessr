@@ -88,6 +88,7 @@ public class GamesHandler {
 		String token = new String(data, 1, TOKEN_SIZE);
 
 		if (!games.containsKey(token)) {
+			System.out.println("duplicated name");
 			socket.send(Protocol.createJoinErrorPacket("Invalid Token".getBytes()));
 			return;
 		}
@@ -121,7 +122,7 @@ public class GamesHandler {
 		for (String randomToken : games.keySet()) {
 			game = games.get(randomToken);
 
-			if (game.isPublic() && game.canJoin()) {
+			if (game.isPublic() && game.canJoin() && !game.contains(username)) {
 				socket.send(Protocol.createGameServedPacket(
 					randomToken.getBytes(),
 					game.isPublic(),
