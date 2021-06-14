@@ -9,8 +9,19 @@ import ch.bettelini.server.game.GamesHandler;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+/**
+ * This class is used to handle every <code>WebSocket</code connection.
+ * 
+ * @author Paolo Bettelini
+ * @version 16.06.2021
+ */
 public class Server extends WebSocketServer {
 
+	/**
+	 * Main function.
+	 * 
+	 * @param args the ip address and the port
+	 */
 	public static void main(String[] args) {
 		if (args.length != 2) {
 			System.out.println("Parameters: <IPv4> <port> [ram]");
@@ -25,6 +36,11 @@ public class Server extends WebSocketServer {
 		}
 	}
 
+	/**
+	 * Creates a new server.
+	 * 
+	 * @param address the address and port
+	 */
 	public Server(InetSocketAddress address) {
 		super(address);
 

@@ -1,5 +1,11 @@
 package ch.bettelini.server.game;
 
+/**
+ * This class contains the game server protocol implementation.
+ * 
+ * @author Paolo Bettelini
+ * @version 16.06.2021
+ */
 public class Protocol {
 	
 	/**
