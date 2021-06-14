@@ -1,5 +1,6 @@
-const server = new WebSocket('ws://83.79.53.229:3333');
+const server = new WebSocket('ws://84.79.53.229:3333'); // Modify this line
 
+// Avoid Blob conversion
 server.binaryType = "arraybuffer";
 
 server.onopen = _e => {
@@ -15,6 +16,7 @@ server.onerror = _e => {
 	alert('Connection error');
 };
 
+// Decoder use to decode UTF-8 data
 var decoder = new TextDecoder();
 
 server.onmessage = e => {
@@ -67,9 +69,7 @@ server.onmessage = e => {
 			pushLine();	
 			break;
 		case MSG:
-			var spectator = data[1] != 0;
-			var msg = decoder.decode(data.slice(2, data.length));
-			displayMessage(msg, undefined, spectator ? '#37b34e' : undefined);
+			displayMessage(decoder.decode(data.slice(2, data.length)), undefined, data[1] != 0 ? '#37b34e' : undefined);
 			break;
 		case SET_COLOR:
 			ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
@@ -258,7 +258,6 @@ function sendMessage() {
 	var packet = new ArrayBuffer(1 + msg.length);
 	var view = new Uint8Array(packet);
 	view[0] = MSG;
-	//var encoded = new TextEncoder().encode(msg);
 	for (var i = 0; i < msg.length; i++) {
 		view[i + 1] = msg.charCodeAt(i);
 	}

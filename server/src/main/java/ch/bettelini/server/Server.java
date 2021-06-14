@@ -26,7 +26,7 @@ public class Server extends WebSocketServer {
 		if (args.length != 2) {
 			System.out.println("Parameters: <IPv4> <port> [ram]");
 			System.out.println("Example:");
-			System.out.println("java -jar server.jar 192.168.1.2 4242 -Xmx1024m");
+			System.out.println("java -jar -Xmx1024m server.jar 192.168.1.2 4242");
 			return;
 		}
 		try {

@@ -138,7 +138,7 @@ function undo(send) {
 	}
 }
 
-canvas.onmouseup = e => {
+canvas.onmouseup = _e => {
 	if (drawing) {
 		if (counter != 0 && --counter % BLOCK_SIZE != 0) { // flush remaining buffer data
 			sendToServer(byteBuffer.slice(0, 1 + ((counter % BLOCK_SIZE) << 2)))
