@@ -22,10 +22,9 @@ header {
 
 #create {
 	display: none;
-	/*display: none;*/
 	position: relative;
 	width: 20%;
-	transform: translate(-50%,0%);
+	transform: translate(-50%, 0%);
 	left: 50%;
 }
 
@@ -36,7 +35,7 @@ header {
 	text-align: center;
 }
 
-#create span{
+#create span {
 	font-family: Roboto;
 	margin: 20px;
 }
@@ -76,7 +75,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .centered {
-	width:100%;
+	width: 100%;
 	display: flex;
 	justify-content: center;
 }
@@ -183,34 +182,40 @@ input[type="text"]:focus {
 	font-size: 20px;
 	border-style: none;
 	border-radius: 7px;
-	background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
+	background: #04AA6D;
 	transform: translate(-50%, 0%);
 	left: 50%;
 	opacity: 70%;
 }
-#create-btn:hover{
+
+#create-btn:hover {
 	animation: btnsAnim 200ms forwards;
 }
-@keyframes btnsAnim{
-	0%{ background: #04AA6D; }
-	100%{ background: #076d47; opacity: 100%; }
-}
 
+@keyframes btnsAnim {
+	0% {
+		background: #04AA6D;
+	}
+	100% {
+		background: #076d47;
+		opacity: 100%;
+	}
+}
 
 #home {
 	display: block;
 	background: white;
 	position: relative;
 	width: 20%;
-	transform: translate(-50%,0%);
+	transform: translate(-50%, 0%);
 	left: 50%;
 }
 
-#home-btns{
+#home-btns {
 	position: relative;
 	display: flex;
 	align-items: center;
-	transform: translate(-50%,0%);
+	transform: translate(-50%, 0%);
 	left: 50%;
 	width: 87%;
 	background: white;
@@ -228,11 +233,8 @@ input[type="text"]:focus {
 	font-size: 20px;
 	border-style: none;
 	border-radius: 7px;
-	background: #04AA6D; /*linear-gradient(to right bottom, #009FFF, #ec2F4B);*/
+	background: #04AA6D;
 	opacity: 0.7;
-	/*transform: translate(-50%, 0%);
-	left: 50%;
-	opacity: 70%;*/
 }
 
 #home button:hover {
@@ -241,7 +243,7 @@ input[type="text"]:focus {
 
 #join-game {
 	position: relative;
-	transform: translate(-50%,0%);
+	transform: translate(-50%, 0%);
 	left: 50%;
 }
 
@@ -251,7 +253,6 @@ input[type="text"]:focus {
 
 #game {
 	display: none;
-	/*display: none;*/
 	background: white;
 }
 
@@ -269,7 +270,6 @@ input[type="text"]:focus {
 	border-radius: 7px;
 	background: #04AA6D;
 	opacity: 0.7;
-	/*linear-gradient(to right bottom, #009FFF, #ec2F4B)*/
 }
 
 #game button:hover {
@@ -312,8 +312,6 @@ input[type="text"]:focus {
 }
 
 #textInput {
-	/*position: relative;*/
-	/*margin-left: -100px;*/
 	width: 200px;
 }
 
@@ -322,35 +320,23 @@ input[type="text"]:focus {
 }
 
 #startButton {
-	/*display: none;*/
 	display: none;
 }
 
-/*table tr:nth-child(odd) td:nth-child(even) {
-	background: red
-}
-
-table tr:nth-child(even) td:nth-child(even) {
-	background: green
-}
-
-table tr:nth-child(even) td:nth-child(odd) {
-	background: red
-}
-
-table tr:nth-child(odd) td:nth-child(odd) {
-	background: green
-}*/
-
-#leaderboard, #gameOverLeaderboard {
+#leaderboard,
+#gameOverLeaderboard {
 	text-align: left;
 }
 
-#gameOverLeaderboard td, #leaderboard td {
+#gameOverLeaderboard td,
+#leaderboard td {
 	padding: 10px;
 }
 
-#gameOverLeaderboard, #gameOverLeaderboard td, #leaderboard, #leaderboard td {
+#gameOverLeaderboard,
+#gameOverLeaderboard td,
+#leaderboard,
+#leaderboard td {
 	border: 1px solid black;
 	border-collapse: collapse;
 }

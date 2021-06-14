@@ -1,178 +1,170 @@
-const GAME_SERVED	= 0;	// token, public, max_players, rounds, turn_duration
-const JOIN_GAME		= 1;	// token, username
-const CREATE_GAME	= 2;	// public, rounds, turn_duration, max_players, username
-const JOIN_RND		= 3		// username
-const START			= 4;	// -
-const PLAYER_JOIN	= 5;	// username
-const PLAYER_LEFT	= 6;	// wasDrawing, username
-const NEXT_TURN		= 7;	// drawing, word
-const GAME_OVER		= 8;	// -
-
-const DRAW_BUFFER	= 20;	// point...
-const MOUSE_UP		= 21;	// -
-const SET_COLOR		= 22;	// r, g, b
-const SET_WIDTH		= 23;	// line width
-const UNDO			= 24;	// -
-
-const MSG			= 30;	// spectator, message
-const ADD_SCORE		= 31;	// amount, username
-
-const JOIN_ERROR	= 201;	// reason
-
 const server = new WebSocket('ws://83.79.53.229:3333');
-//const server = new WebSocket('ws://localhost:3333');
-//const server = new WebSocket('ws://192.168.1.115:3333');
+
 server.binaryType = "arraybuffer";
 
-var decoder = new TextDecoder();
-
-server.onopen = function(e) {
+server.onopen = _e => {
 	console.log("Connection established");
 };
 
-server.onmessage = function(e) {
+server.onclose = _e => {
+	console.log("Server closed");
+};
+
+server.onerror = _e => {
+	console.log("Connection error");
+	alert('Connection error');
+};
+
+var decoder = new TextDecoder();
+
+server.onmessage = e => {
 	var data = new Uint8Array(e.data);
-	var cmd = data[0];
 
-	if (cmd == GAME_SERVED) {
-		var token = "";
-		for (var i = 0; i < 5; i++) {
-			token += String.fromCharCode(data[i + 1]);
-		}
-
-		//public = data[5 + 1] != 0;
-		maxPlayers = data[5 + 2] & 0xFF
-		rounds = data[5 + 3] & 0xFF;
-		turnDuration = data[5 + 4] & 0xFF;
-
-		document.getElementById('token').innerHTML = "Token: " + token + "";
-
-		if (creator) {
-			document.getElementById('startButton').style.display = 'block';
-			document.getElementById('startButton').disabled = true;
-		}
-
-		// Toggle to game view
-		showGameSection();
-
-		leaderboard = {};
-	} else if (cmd == PLAYER_JOIN) {
-		var name = "";
-		for (var i = 0; i < data.length - 1; i++) {
-			name += String.fromCharCode(data[i + 1]);
-		}
-
-		if (++players > 1) {
-			document.getElementById('startButton').disabled = false;
-		}
-
-		setStatus("Waiting... (" + players + "/" + maxPlayers + ")");
-
-		leaderboard[name] = 0;
-		displayLeaderboard();
-	} else if (cmd == DRAW_BUFFER) {
-		drawLineBuf(data.slice(1, data.length));
-	} else if (cmd == MOUSE_UP) {
-		mouseUp();
-		pushLine();
-	} else if (cmd == MSG) {
-		var spectator = data[1] != 0;
-		var msg = decoder.decode(data.slice(2, data.length));
-		displayMessage(msg, undefined, spectator ? '#37b34e' : undefined);
-	} else if (cmd == SET_COLOR) {
-		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
-	} else if (cmd == SET_WIDTH) {
-		setWidth(data[1], false);
-	} else if (cmd == NEXT_TURN) {
-		++currentTurn;
-		if (currentTurn == players + 1) {
-			currentTurn = 1;
-		}
-		if (currentTurn == 1) {
-			++currentRound;
-		}
-		drawing = data[1] != 0;
-		var word = "";
-		for (var i = 0; i < data.length - 2; i++) {
-			word += String.fromCharCode(data[i + 2]);
-		}
-
-		// clear canvas
-		clearCanvas();
-
-		ctx.strokeStyle = "#000000";
-		setWidth(5, false);
-
-		colorInput.disabled = !drawing;
-		widthInput.disabled = !drawing;
-
-		lineHistory = [];
-		currentLine = [];
-		historyPos = 0;
-
-		playersWhoWonTheTurn = [];
-		displayLeaderboard();
-
-		document.getElementById('word').innerHTML = word;
-		
-		setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
-		
-		if (currentTurn == 1) {
-			startButton.style.display = 'none';
-		}
-
-		nextTurn();
-	} else if (cmd == JOIN_ERROR) {
-		var msg = "";
-		for (var i = 0; i < data.length - 1; i++) {
-			msg += String.fromCharCode(data[i + 1]);
-		}
-
-		alert(msg);
-	} else if (cmd == ADD_SCORE) {
-		var amount = data[1] & 0xFF;
-		var name = "";
-		for (var i = 0; i < data.length - 2; i++) {
-			name += String.fromCharCode(data[i + 2]);
-		}
-
-		playersWhoWonTheTurn.push(name);
-
-		displayMessage(name + ' guessed the word', '#90EE90');
-
-		leaderboard[name] += amount;
-		
-		if (players != playersWhoWonTheTurn.length + 1) {
-			displayLeaderboard();
-		}
-	} else if (cmd == PLAYER_LEFT) {
-		var name = "";
-		for (var i = 0; i < data.length - 2; i++) {
-			name += String.fromCharCode(data[i + 2]);
-		}
-		displayMessage(name + ' left the game', '#FA8072');
-		--players;
-		if (data[1] != 0) { // if the drawing player left
-			--currentTurn;
-			if (currentTurn == 0) {
-				--currentRound;
+	switch (data[0]) {
+		case GAME_SERVED:
+			var token = "";
+			for (var i = 0; i < 5; i++) {
+				token += String.fromCharCode(data[i + 1]);
 			}
-		} else {
+	
+			public = data[5 + 1] != 0;
+			maxPlayers = data[5 + 2] & 0xFF
+			rounds = data[5 + 3] & 0xFF;
+			turnDuration = data[5 + 4] & 0xFF;
+	
+			document.getElementById('token').innerHTML = "Token: " + token + "";
+	
+			if (creator) {
+				document.getElementById('startButton').style.display = 'block';
+				document.getElementById('startButton').disabled = true;
+			}
+	
+			// Toggle to game view
+			showGameSection();
+	
+			leaderboard = {};
+			break;
+		case PLAYER_JOIN:
+			var name = "";
+			for (var i = 0; i < data.length - 1; i++) {
+				name += String.fromCharCode(data[i + 1]);
+			}
+
+			if (++players > 1) {
+				document.getElementById('startButton').disabled = false;
+			}
+
+			setStatus("Waiting... (" + players + "/" + maxPlayers + ")");
+
+			leaderboard[name] = 0;
+			displayLeaderboard(leaderboard);
+			break;
+		case DRAW_BUFFER:
+			drawLineBuf(data.slice(1, data.length));
+			break;
+		case MOUSE_UP:
+			mouseUp();
+			pushLine();	
+			break;
+		case MSG:
+			var spectator = data[1] != 0;
+			var msg = decoder.decode(data.slice(2, data.length));
+			displayMessage(msg, undefined, spectator ? '#37b34e' : undefined);
+			break;
+		case SET_COLOR:
+			ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
+			break;
+		case SET_WIDTH:
+			setWidth(data[1], false);
+			break;
+		case NEXT_TURN:
+			++currentTurn;
+			if (currentTurn == players + 1) {
+				currentTurn = 1;
+			}
+			if (currentTurn == 1) {
+				++currentRound;
+			}
+			drawing = data[1] != 0;
+			var word = "";
+			for (var i = 0; i < data.length - 2; i++) {
+				word += String.fromCharCode(data[i + 2]);
+			}
+	
+			// clear canvas
+			clearCanvas();
+	
+			ctx.strokeStyle = "#000000";
+			setWidth(5, false);
+	
+			colorInput.disabled = !drawing;
+			widthInput.disabled = !drawing;
+	
+			lineHistory = [];
+			currentLine = [];
+			historyPos = 0;
+	
+			playersWhoWonTheTurn = [];
+			displayLeaderboard(leaderboard);
+	
+			document.getElementById('word').innerHTML = word;
+			
 			setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
-		}
-	} else if (cmd == GAME_OVER) {
-		gameOver();
-	} else if (cmd == UNDO) {
-		undo(false);
+			
+			if (currentTurn == 1) {
+				startButton.style.display = 'none';
+			}
+	
+			nextTurn();
+			break;
+		case JOIN_ERROR:
+			var msg = "";
+			for (var i = 0; i < data.length - 1; i++) {
+				msg += String.fromCharCode(data[i + 1]);
+			}
+	
+			alert(msg);
+			break;
+		case ADD_SCORE:
+			var amount = data[1] & 0xFF;
+			var name = "";
+			for (var i = 0; i < data.length - 2; i++) {
+				name += String.fromCharCode(data[i + 2]);
+			}
+	
+			playersWhoWonTheTurn.push(name);
+	
+			displayMessage(name + ' guessed the word', '#90EE90');
+	
+			leaderboard[name] += amount;
+			
+			if (players != playersWhoWonTheTurn.length + 1) {
+				displayLeaderboard(leaderboard);
+			}
+			break;
+		case PLAYER_LEFT:
+			var name = "";
+			for (var i = 0; i < data.length - 2; i++) {
+				name += String.fromCharCode(data[i + 2]);
+			}
+			displayMessage(name + ' left the game', '#FA8072');
+			--players;
+			if (data[1] != 0) { // if the drawing player left
+				--currentTurn;
+				if (currentTurn == 0) {
+					--currentRound;
+				}
+			} else {
+				setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
+			}
+			break;
+		case GAME_OVER:
+			gameOver();
+			break;
+		case UNDO:
+			undo(false);
+			break;
 	}
-};
-
-server.onclose = function(e) {
-	//alert('Connection error');
-};
-
-server.onerror = function(e) {
-	//alert('Connection error');
 };
 
 function sendToServer(data) {
@@ -252,14 +244,6 @@ function createGame() {
 	sendToServer(packet);
 }
 
-var textInput = document.getElementById('textInput');
-
-textInput.addEventListener('keydown', e => {
-	if (e.key == "Enter") {
-		sendMessage();
-	}
-})
-
 function sendMessage() {
 	var msg = textInput.value;
 	if (msg == '') {
@@ -281,29 +265,9 @@ function sendMessage() {
 	sendToServer(packet);
 }
 
-var textarea = document.getElementById('textarea');
-
 function start() {
 	var packet = new ArrayBuffer(1);
 	var view = new Uint8Array(packet);
 	view[0] = START
 	sendToServer(view);
-}
-
-function displayMessage(msg, backColor, foreColor) {
-	var el = document.createElement('p');
-	el.appendChild(document.createTextNode(msg));
-	if (backColor != undefined) {
-		el.style.backgroundColor = backColor;
-		el.style.fontWeight = 'bold';
-	}
-	if (foreColor != null) {
-		el.style.color = foreColor;
-	}
-	textarea.appendChild(el)
-	textarea.scrollTop = textarea.scrollHeight;
-}
-
-function setStatus(status) {
-	document.getElementById('status').innerHTML = status;
 }

@@ -1,6 +1,5 @@
 var countdown = document.getElementById('timeLeft');
 var canvas = document.getElementById('canvas');
-var table = document.getElementById('leaderboard');
 var widthInput = document.getElementById('rangeWidth');
 var colorInput = document.getElementById('changeColor');
 var dot = document.getElementById('circle');
@@ -31,23 +30,6 @@ function gameOver() {
 	showGameOver(leaderboard);
 }
 
-function displayLeaderboard() {
-	var keys = keys = Object.keys(leaderboard);
-	keys = keys.sort((a, b) => leaderboard[a] > leaderboard[b] ? -1 : 1);
-
-	var html = '';
-	
-	for (var i = 0; i < keys.length; i++) {
-		html += '<tr' + (playersWhoWonTheTurn.includes(keys[i]) ? ' class="lightgreen"' : '') + '>';
-		html += '<td>' + (i + 1) + '.';
-		html += '<td>' + keys[i];
-		html += '<td>' + leaderboard[keys[i]];
-		html += '</tr>';
-	}
-
-	table.innerHTML = html;
-}
-
 function setColor(v) {
 	if (drawing) {
 		ctx.strokeStyle = v;
@@ -63,6 +45,7 @@ function setColor(v) {
 		sendToServer(packet);
 	}
 }
+
 
 function updateDot(v) {
 	if (drawing) {
@@ -265,9 +248,3 @@ function redraw() {
 		ctx.stroke();
 	}
 }
-
-document.addEventListener('keydown', e => {
-	if (e.key == 'z' && e.ctrlKey) {
-		undo(true);
-	}
-});
