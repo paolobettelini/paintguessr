@@ -136,14 +136,15 @@ var initLine = true;
 
 function undo(send) {
 	if (lineHistory.length != 0) {
-		var oldColor = lineHistory[lineHistory.length - 1].color;
-		var oldLineWidth = lineHistory[lineHistory.length - 1].thickness;
 		lineHistory.pop()
+		
+		var oldColor = ctx.strokeStyle;
+		var oldLineWidth = ctx.lineWidth;
 
 		redraw();
 
 		ctx.fillStyle = oldColor;
-		ctx.lineWidth = oldLineWidth;
+		setWidth(oldLineWidth, false);
 	
 		if (drawing && send) {
 			var packet = new ArrayBuffer(1);
@@ -251,7 +252,7 @@ function redraw() {
 		
 		var line = lineHistory[i].line;
 		ctx.strokeStyle = lineHistory[i].color;
-		setWidth(lineHistory[i].thickness, false);
+		ctx.lineWidth = lineHistory[i].thickness;
 
 		for (var j = 0; j < line.length; j++) {
 			var point = line[j];
@@ -264,3 +265,9 @@ function redraw() {
 		ctx.stroke();
 	}
 }
+
+document.addEventListener('keydown', e => {
+	if (e.key == 'z' && e.ctrlKey) {
+		undo(true);
+	}
+});

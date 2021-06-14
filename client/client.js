@@ -77,16 +77,12 @@ server.onmessage = function(e) {
 		pushLine();
 	} else if (cmd == MSG) {
 		var spectator = data[1] != 0;
-		console.log(data.slice(2, data.length))
 		var msg = decoder.decode(data.slice(2, data.length));
 		displayMessage(msg, undefined, spectator ? '#37b34e' : undefined);
 	} else if (cmd == SET_COLOR) {
 		ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 	} else if (cmd == SET_WIDTH) {
-
-		ctx.lineWidth = data[1];
-		widthInput.value = data[1];
-		dot.setAttribute('r', data[1] / 2);
+		setWidth(data[1], false);
 	} else if (cmd == NEXT_TURN) {
 		++currentTurn;
 		if (currentTurn == players + 1) {
