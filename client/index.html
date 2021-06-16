@@ -99,7 +99,7 @@
 					<br>
 					<br>
 					<div>
-						<input type="range" id="rangeWidth" min="1" max="20" value="5" oninput="updateDot(this.value)" onchange="setWidth(this.value, true)">
+						<input type="range" id="rangeWidth" min="1" max="20" value="5" oninput="setWidth(this.value, false)" onchange="setWidth(this.value, true)">
 						<svg height="20" width="20" style="margin-bottom: 5px;">
 							<circle id="circle" cx="10" cy="10" r="2.5" fill="#bbb"/>
 						</svg> 
