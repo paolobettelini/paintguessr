@@ -30,6 +30,12 @@ function gameOver() {
 	showGameOver(leaderboard);
 }
 
+/**
+ * Changes the color and sends a packet to the server to
+ * notify it.
+ * 
+ * @param {string} v the color.
+ */
 function setColor(v) {
 	if (drawing) {
 		ctx.strokeStyle = v;
@@ -46,13 +52,12 @@ function setColor(v) {
 	}
 }
 
-
-function updateDot(v) {
-	if (drawing) {
-		dot.setAttribute('r', v / 2);
-	}
-}
-
+/**
+ * Changes the width of the brush.
+ * 
+ * @param {number} v the new width.
+ * @param {boolean} send notify the server.
+ */
 function setWidth(v, send) {
 	ctx.lineWidth = v;
 	widthInput.value = v;
@@ -68,22 +73,26 @@ function setWidth(v, send) {
 }
 
 let counter = 0;
-const BLOCK_SIZE = 7;
+const BLOCK_SIZE = 10;
 
-var buffer = new ArrayBuffer(1 + BLOCK_SIZE * 4);
-
+var buffer = new ArrayBuffer(1 + (BLOCK_SIZE << 2));
 var byteBuffer = new Uint8Array(buffer);
-
 byteBuffer[0] = DRAW_BUFFER;
 
+/**
+ * Fires when the user moves the mouse over the object.
+ * 
+ * @param {Ev} e the mouse event.
+ */
 canvas.onmousemove = e => {
 	var x = e.offsetX;
 	var y = e.offsetY;
 	if (drawing && dragging && y >= 0 && x >= 0 && x < width && y < height) {
-		if (counter % BLOCK_SIZE == 0 && counter != 0) {
+		if (counter % BLOCK_SIZE == 0 && counter != 0) { // packet complete
 			sendToServer(byteBuffer);
 		}
 
+		// draw locally
 		if (initLine) {
 			initLine = false;
 			ctx.moveTo(x, y);
@@ -92,11 +101,13 @@ canvas.onmousemove = e => {
 			ctx.stroke();
 		}
 
+		// store line
 		currentLine.push({
 			x: x,
 			y: y
 		});
 		
+		// add data to packet
 		var w = 65535 * (x / width) | 0;
 		var h = 65535 * (y / height) | 0;
 		byteBuffer[((counter % BLOCK_SIZE) << 2) + 1] = w >>> 8;
@@ -107,7 +118,14 @@ canvas.onmousemove = e => {
 		++counter;
 	}
 }
+
+/**
+ * Fires when the user clicks the object with either mouse button.
+ * 
+ * @param {ev} e the mouse event. 
+ */
 canvas.onmousedown = e => {
+	// starting drawing
 	dragging = true;
 	x = e.offsetX
 	y = e.offsetY
