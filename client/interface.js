@@ -1,3 +1,10 @@
+/**
+ * 
+ * Returns a reference to the first object with the specified value of the ID attribute.
+ *
+ * @param elementId String that specifies the ID value.
+ * @returns the DOM elements
+ */
 function el(id) {
 	return document.getElementById(id);
 }
@@ -11,7 +18,7 @@ var public = true;
 var maxPlayers = 5;
 var username = "";
 var rounds = 3;
-var turnDuration = 30;
+var turnDuration = 60;
 
 var homeSection = el('home');
 var createSection = el('create');

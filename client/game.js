@@ -1,3 +1,4 @@
+// DOM elements
 var countdown = document.getElementById('timeLeft');
 var canvas = document.getElementById('canvas');
 var widthInput = document.getElementById('rangeWidth');
@@ -7,9 +8,11 @@ var ctx = canvas.getContext('2d');
 var width = canvas.width;
 var height = canvas.height;
 
+// History
 var lineHistory = [];
 var currentLine = [];
 
+// Game and drawing variables
 var dragging = false;
 var drawing = false;
 var leaderboard;
@@ -21,10 +24,16 @@ var currentRound = 0;
 var creator = false;
 var players = 0;
 
+// Set round brush lines
 ctx.lineCap = 'round';
+
+// Disable brush settings
 colorInput.disabled = true;
 widthInput.disabled = true;
 
+ /**
+  * Switch to game over leaderboard view
+  */
 function gameOver() {
 	clearInterval(timerTask);
 	showGameOver(leaderboard);
@@ -72,8 +81,11 @@ function setWidth(v, send) {
 	}
 }
 
-let counter = 0;
+/**
+ * How much data each packet contains
+ */
 const BLOCK_SIZE = 10;
+let counter = 0;
 
 var buffer = new ArrayBuffer(1 + (BLOCK_SIZE << 2));
 var byteBuffer = new Uint8Array(buffer);
@@ -135,6 +147,7 @@ canvas.onmousedown = e => {
 var x0 = -1, y0 = -1;
 var initLine = true;
 
+// Undo last line
 function undo(send) {
 	if (lineHistory.length != 0) {
 		lineHistory.pop()
@@ -147,7 +160,7 @@ function undo(send) {
 		ctx.fillStyle = oldColor;
 		setWidth(oldLineWidth, false);
 	
-		if (drawing && send) {
+		if (drawing && send) { // Notify the server
 			var packet = new ArrayBuffer(1);
 			var view = new Uint8Array(packet);
 			view[0] = UNDO;
@@ -171,6 +184,10 @@ canvas.onmouseup = _e => {
 	}
 }
 
+/**
+ * Removes the current scheduler task and starts a new one
+ * for this turn.
+ */
 function nextTurn() {
 	if (timerTask != null) {
 		clearInterval(timerTask);
@@ -187,6 +204,9 @@ function nextTurn() {
 	}, 1000);
 }
 
+/**
+ * Called when the player ends drawing a line.
+ */
 function mouseUp() {
 	if (dragging) {
 		pushLine();
@@ -197,6 +217,9 @@ function mouseUp() {
 	counter = 0;
 }
 
+/**
+ * Pushes a line into history.
+ */
 function pushLine() {
 	lineHistory.push({
 		line: currentLine,
@@ -206,11 +229,19 @@ function pushLine() {
 	currentLine = [];
 }
 
+/**
+ * Clears the canvas.
+ */
 function clearCanvas() {
 	ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, width, height);
 }
 
+/**
+ * Draws a line buffer to the canvas.
+ * 
+ * @param {ArrayBuffer} buf the buffer 
+ */
 function drawLineBuf(buf) {
 	ctx.beginPath();
 	
@@ -245,6 +276,9 @@ function drawLineBuf(buf) {
 	ctx.stroke();
 }
 
+/**
+ * Redraws the history to the canvas.
+ */
 function redraw() {
 	clearCanvas();
 

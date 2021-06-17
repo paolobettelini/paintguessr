@@ -1,4 +1,4 @@
-const server = new WebSocket('ws://84.79.53.229:3333'); // Modify this line
+const server = new WebSocket('ws://83.79.53.229:3333'); // Modify this line
 
 // Avoid Blob conversion
 server.binaryType = "arraybuffer";
@@ -19,24 +19,29 @@ server.onerror = _e => {
 // Decoder use to decode UTF-8 data
 var decoder = new TextDecoder();
 
+// Manage packet reception
 server.onmessage = e => {
 	var data = new Uint8Array(e.data);
 
 	switch (data[0]) {
 		case GAME_SERVED:
 			var token = "";
+			// Read token from packet
 			for (var i = 0; i < 5; i++) {
 				token += String.fromCharCode(data[i + 1]);
 			}
 	
+			// Read room settings
 			public = data[5 + 1] != 0;
 			maxPlayers = data[5 + 2] & 0xFF
 			rounds = data[5 + 3] & 0xFF;
 			turnDuration = data[5 + 4] & 0xFF;
 	
+			// Display token
 			document.getElementById('token').innerHTML = "Token: " + token + "";
 	
 			if (creator) {
+				// Display start button
 				document.getElementById('startButton').style.display = 'block';
 				document.getElementById('startButton').disabled = true;
 			}
@@ -48,36 +53,45 @@ server.onmessage = e => {
 			break;
 		case PLAYER_JOIN:
 			var name = "";
+			// Read the name of the player from packet
 			for (var i = 0; i < data.length - 1; i++) {
 				name += String.fromCharCode(data[i + 1]);
 			}
 
 			if (++players > 1) {
+				// Enable the start button
 				document.getElementById('startButton').disabled = false;
 			}
 
+			// Update status
 			setStatus("Waiting... (" + players + "/" + maxPlayers + ")");
 
+			// Add the new player to the leaderboard
 			leaderboard[name] = 0;
 			displayLeaderboard(leaderboard);
 			break;
 		case DRAW_BUFFER:
+			// Draw the buffer data
 			drawLineBuf(data.slice(1, data.length));
 			break;
 		case MOUSE_UP:
 			mouseUp();
-			pushLine();	
+			pushLine();
 			break;
 		case MSG:
+			// Display message on the chat
 			displayMessage(decoder.decode(data.slice(2, data.length)), undefined, data[1] != 0 ? '#37b34e' : undefined);
 			break;
 		case SET_COLOR:
+			// Set the brush color
 			ctx.strokeStyle = 'rgb(' + data[1] + ',' + data[2] + ',' + data[3] + ')';
 			break;
 		case SET_WIDTH:
+			// Set the brush width
 			setWidth(data[1], false);
 			break;
 		case NEXT_TURN:
+			// Update turn/round variables
 			++currentTurn;
 			if (currentTurn == players + 1) {
 				currentTurn = 1;
@@ -85,49 +99,61 @@ server.onmessage = e => {
 			if (currentTurn == 1) {
 				++currentRound;
 			}
+			// Check if you're the next one drawing
 			drawing = data[1] != 0;
 			var word = "";
+			// Read the word from the packet
 			for (var i = 0; i < data.length - 2; i++) {
 				word += String.fromCharCode(data[i + 2]);
 			}
 	
-			// clear canvas
+			// Clear canvas
 			clearCanvas();
 	
+			// Reset brush settings
 			ctx.strokeStyle = "#000000";
 			setWidth(5, false);
 	
+			// Disable/Enable brush control
 			colorInput.disabled = !drawing;
 			widthInput.disabled = !drawing;
 	
+			// Reset history
 			lineHistory = [];
 			currentLine = [];
 			historyPos = 0;
 	
+			// Reset leaderboard winnings
 			playersWhoWonTheTurn = [];
 			displayLeaderboard(leaderboard);
 	
+			// Display the word
 			document.getElementById('word').innerHTML = word;
 			
+			// Update the status
 			setStatus("Round " + currentRound + "/" + rounds + " Turn " + currentTurn + "/" + players);
 			
 			if (currentTurn == 1) {
+				// Remove the start button
 				startButton.style.display = 'none';
 			}
 	
+			// Handle scheduler tasks
 			nextTurn();
 			break;
 		case JOIN_ERROR:
 			var msg = "";
+			// Read the message from the packet
 			for (var i = 0; i < data.length - 1; i++) {
 				msg += String.fromCharCode(data[i + 1]);
 			}
-	
+
 			alert(msg);
 			break;
 		case ADD_SCORE:
 			var amount = data[1] & 0xFF;
 			var name = "";
+			// Read the name of the receiver
 			for (var i = 0; i < data.length - 2; i++) {
 				name += String.fromCharCode(data[i + 2]);
 			}
@@ -138,18 +164,26 @@ server.onmessage = e => {
 	
 			leaderboard[name] += amount;
 			
+			// Do not update the leaderboard if this is going to cause the next turn to start
+			// You'd just see the green for some milliseconds before the new turn reset the leaderboard.
 			if (players != playersWhoWonTheTurn.length + 1) {
 				displayLeaderboard(leaderboard);
 			}
 			break;
 		case PLAYER_LEFT:
 			var name = "";
+			// Read the player name
 			for (var i = 0; i < data.length - 2; i++) {
 				name += String.fromCharCode(data[i + 2]);
 			}
+
 			displayMessage(name + ' left the game', '#FA8072');
+
 			--players;
-			if (data[1] != 0) { // if the drawing player left
+
+			// If the player was drawing the next turn won't its number
+			// eg. (2/5) -> (2/4)
+			if (data[1] != 0) {
 				--currentTurn;
 				if (currentTurn == 0) {
 					--currentRound;
@@ -167,10 +201,12 @@ server.onmessage = e => {
 	}
 };
 
+// Send a packet to the websocket
 function sendToServer(data) {
 	server.send(data);
 }
 
+// Send join game request
 function joinGame(token) {
 	if (username.length == 0) {
 		alert('Username cannot be empty')
@@ -196,6 +232,7 @@ function joinGame(token) {
 	sendToServer(packet);
 }
 
+// Send join random request
 function joinRandom() {
 	if (username.length == 0) {
 		alert('Username cannot be empty');
@@ -218,6 +255,7 @@ function joinRandom() {
 	sendToServer(packet);
 }
 
+// Send create game request
 function createGame() {
 	if (username == '') {
 		alert('Username cannot be empty')
@@ -244,6 +282,7 @@ function createGame() {
 	sendToServer(packet);
 }
 
+// Send a message packet
 function sendMessage() {
 	var msg = textInput.value;
 	if (msg == '') {
@@ -264,9 +303,10 @@ function sendMessage() {
 	sendToServer(packet);
 }
 
+// Send the start packet
 function start() {
 	var packet = new ArrayBuffer(1);
 	var view = new Uint8Array(packet);
-	view[0] = START
+	view[0] = START;
 	sendToServer(view);
 }

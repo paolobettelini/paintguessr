@@ -165,8 +165,6 @@ public class Game {
 		if (players.size() == maxPlayers) {
 			start();
 		}
-
-		System.out.println(players.size());
 	}
 
 	/**

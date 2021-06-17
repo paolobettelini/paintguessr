@@ -5,26 +5,29 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="./style.css">
-	
 	<title>Client</title>
 </head>
 <body>
 	<header>
 		<h1 id="title">Paint Guessr</h1>
 	</header>
-
 	<br>
-	
 	<div id="create">
 		<h1 class="title">Create Game</h1>
 		<br>
-		<span id="maxPlayersDisplay">Max Players (5)</span> <br>
-		<input type="range" value="5" min="2" max="15" step="1" oninput="setMaxPlayers(this.value)"> <br>
-		<span id="roundsDisplay">Rounds (3)</span> <br>
-		<input type="range" value="3" min="1" max="15" step="1" oninput="setRounds(this.value)"> <br>
-		<span id="turnDurationDisplay">Turn Duration (30s)</span> <br>
-		<input type="range" value="30" min="15" max="180" step="1" oninput="setTurnDuration(this.value)"> <br> <br>
-		
+		<span id="maxPlayersDisplay">Max Players (5)</span>
+		<br>
+		<input type="range" value="5" min="2" max="15" step="1" oninput="setMaxPlayers(this.value)">
+		<br>
+		<span id="roundsDisplay">Rounds (3)</span>
+		<br>
+		<input type="range" value="3" min="1" max="15" step="1" oninput="setRounds(this.value)">
+		<br>
+		<span id="turnDurationDisplay">Turn Duration (60s)</span>
+		<br>
+		<input type="range" value="60" min="15" max="180" step="1" oninput="setTurnDuration(this.value)">
+		<br>
+		<br>
 		<article class="centered">
 			<div class="wrapper">
 				<input type="radio" name="select" id="option-1" onchange="updateVisibility()" checked>
@@ -46,9 +49,6 @@
 		<br>
 		<button id="create-btn" onclick="createGame()">Create</button>
 	</div>
-
-	<!--<hr>-->
-
 	<div id="home">
 		<h1 class="title">Home</h1>
 		<br>
@@ -56,30 +56,25 @@
 			<button id="create-game" onclick="showCreateSection()">Create Game</button> 
 			<button id="join-random" onclick="joinRandom()">Join Random</button>
 		</div>
-
-		<br><br>
-
+		<br>
+		<br>
 		<article class="centered">
 			<input id="tokenInput" placeholder="Token" type="text"> <br> <br>
 			<input id="homeSectionUsername" type="text" placeholder="Username" oninput="setUsername(this.value)">
 		</article>
-
-		<br><br><br>
+		<br>
+		<br>
+		<br>
 		<button id="join-game" onclick="joinGame(document.getElementById('tokenInput').value)">Join Game</button>
-
-		<br><br>
+		<br>
+		<br>
 	</div>
-
-	<!--<hr>-->
-
 	<div id="game">
 		<h1 class="title">Playing</h1>
 		<br>
-
 		<div class="centered">
 			<button id="startButton" onclick="start()">Start</button>
 		</div>
-		
 		<table style="width: 100%;text-align: center;">
 			<tr>
 				<td>
@@ -134,7 +129,6 @@
 			</tr>
 		</table>
 	</div>
-
 	<div id="gameOver">
 		<h1 class="title">Game Over</h1>
 		<br>
@@ -143,7 +137,6 @@
 			</table>
 		</div>
 	</div>
-	
 	<script src="protocol.js"></script>
 	<script src="client.js"></script>
 	<script src="game.js"></script>
