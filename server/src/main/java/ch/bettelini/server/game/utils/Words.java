@@ -20,7 +20,6 @@ public class Words {
 		words = new String[] {
 			"toothpaste",
 			"lightsaber",
-			"skyscraper",
 			"telescope",
 			"swordfish",
 			"spongebob",
@@ -36,7 +35,6 @@ public class Words {
 			"internet",
 			"sandwich",
 			"scissors",
-			"seahorse",
 			"skeleton",
 			"snowball",
 			"computer",
@@ -44,7 +42,48 @@ public class Words {
 			"bread",
 			"database",
 			"chocolate",
-			"physics",
+			"tennis",
+			"speech",
+			"river",
+			"hair",
+			"cigarette",
+			"lake",
+			"highway",
+			"bow",
+			"youtube",
+			"cookie",
+			"bitcoin",
+			"fire truck",
+			"diamond",
+			"sunrise",
+			"ketchup",
+			"atom",
+			"solar system",
+			"baguette",
+			"crocodile",
+			"hexagon",
+			"space suit",
+			"time machine",
+			"x-ray",
+			"gold",
+			"bed",
+			"chess",
+			"bottle",
+			"anvil",
+			"frog",
+			"sausage",
+			"blockchain",
+			"UFO",
+			"DNA",
+			"cactus",
+			"ice cream",
+			"google",
+			"nutella",
+			"thunder",
+			"strawberry",
+			"circus",
+			"injection",
+			"mirror"
 		};
 	}
 
@@ -70,8 +109,10 @@ public class Words {
 	public static String obfuscate(String word) {
 		StringBuilder builder = new StringBuilder();
 
+		char c;
 		for (int i = 0; i < word.length(); i++) {
-			builder.append(word.charAt(i) == ' ' ? ' ' : '_');
+			c = word.charAt(i);
+			builder.append(c == ' ' || c == '-' ? c : '_');
 		}
 
 		return builder.toString();
