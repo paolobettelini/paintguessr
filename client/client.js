@@ -1,4 +1,4 @@
-const server = new WebSocket('ws://83.79.53.229:3333'); // Modify this line
+const server = new WebSocket('ws://XXX.XXX.XXX.XXX:PORT'); // Modify this line
 
 // Avoid Blob conversion
 server.binaryType = "arraybuffer";
