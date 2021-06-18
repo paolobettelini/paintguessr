@@ -179,7 +179,7 @@ public class Game {
 
 		String msg = new String(data, 1, data.length - 1);
 
-		if (currentWord != null && !status && currentWord.equalsIgnoreCase(msg)) {
+		if (currentWord != null && !status && currentWord.equalsIgnoreCase(msg.trim())) {
 			int amount = 100 - (int) (System.currentTimeMillis() - roundStartTime) / turnDuration / 10;
 			broadcast(Protocol.createAddScorePacket(amount, sender.getUsername().getBytes()));
 			
@@ -289,7 +289,8 @@ public class Game {
 		this.currentWord = Words.random();
 		do {
 			this.currentWord = Words.random();
-		} while(lastWords.contains(this.currentWord));
+			// stop generating unique words after 25
+		} while (lastWords.size() < 25 && lastWords.contains(this.currentWord));
 		lastWords.add(currentWord);
 
 		byte[] packet = Protocol.createNextTurnPacket(false, Words.obfuscate(currentWord).getBytes());
@@ -365,12 +366,16 @@ public class Game {
 	public void removePlayer(WebSocket socket) {
 		byte[] username = players.get(socket).getUsername().getBytes();
 		players.remove(socket);
+
 		boolean wasDrawing = socket == drawing;
 		broadcast(Protocol.createPlayerLeftPacket(username, wasDrawing));
 
 		if (players.size() < 2) {
 			GameOver();
 		} else if (wasDrawing) {
+			--currentTurn;
+			forceNextTurn();
+		} else if (isTurnComplete()) {
 			forceNextTurn();
 		}
 	}

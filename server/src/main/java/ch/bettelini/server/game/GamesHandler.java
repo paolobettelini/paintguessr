@@ -82,10 +82,12 @@ public class GamesHandler {
 	 * @param game the game to remove
 	 */
 	static void delete(Game game) {
-		for (String token : games.keySet()) {
-			if (games.get(token) == game) {
-				game.release();
-				games.remove(token);
+		synchronized (games) {
+			for (String token : games.keySet()) {
+				if (games.get(token) == game) {
+					game.release();
+					games.remove(token);
+				}
 			}
 		}
 	}
