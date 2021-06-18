@@ -83,7 +83,10 @@ public class Words {
 			"strawberry",
 			"circus",
 			"injection",
-			"mirror"
+			"mirror",
+			"whale",
+			"fountain",
+			"programming"
 		};
 	}
 
