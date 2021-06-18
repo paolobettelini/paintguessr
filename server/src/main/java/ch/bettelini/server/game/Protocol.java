@@ -3,6 +3,10 @@ package ch.bettelini.server.game;
 /**
  * This class contains the game server protocol implementation.
  * 
+ * TODO:
+ * Adding 'lastWord' and '[drawing] player' name to the NEXT_TURN packet,
+ * so the client can display it in the chat.
+ * 
  * @author Paolo Bettelini
  * @version 16.06.2021
  */

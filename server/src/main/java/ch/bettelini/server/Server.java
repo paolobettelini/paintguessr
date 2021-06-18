@@ -4,13 +4,13 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import ch.bettelini.server.game.GamesHandler;
-
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+import ch.bettelini.server.game.GamesHandler;
+
 /**
- * This class is used to handle every <code>WebSocket</code connection.
+ * This class is used to handle every <code>WebSocket</code> connection.
  * 
  * @author Paolo Bettelini
  * @version 16.06.2021
@@ -24,16 +24,24 @@ public class Server extends WebSocketServer {
 	 */
 	public static void main(String[] args) {
 		if (args.length != 2) {
-			System.out.println("Parameters: <IPv4> <port> [ram]");
+			System.out.println("Parameters: <IPv4> <port>");
 			System.out.println("Example:");
 			System.out.println("java -jar -Xmx1024m server.jar 192.168.1.2 4242");
 			return;
 		}
+		
+		Server server;
 		try {
-			new Server(new InetSocketAddress(args[0], Integer.parseInt(args[1]))).start();
-		} catch (Exception e) {
-			e.printStackTrace();
+			server = new Server(new InetSocketAddress(args[0], Integer.parseInt(args[1])));
+		} catch (IllegalArgumentException e) {
+			System.err.println("Invalid port number");
+			return;
+		} catch (SecurityException e) {
+			System.err.println("Couldn't resolve the hostname - Permission denied");
+			return;
 		}
+
+		server.start();
 	}
 
 	/**
