@@ -26,6 +26,7 @@ var players = 0;
 
 // Set round brush lines
 ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
 
 // Disable brush settings
 colorInput.disabled = true;
